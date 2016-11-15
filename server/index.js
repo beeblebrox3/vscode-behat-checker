@@ -30,35 +30,28 @@ connection.onInitialize(function (params) {
 
 // documents.onDidSave((change) => {
 documents.onDidChangeContent((change) => {
-    exec(`notify-send "content changed"`);
+    // exec(`notify-send "content changed"`);
     let invalidLines = FeatureLinterInstance.lint(change.document.getText());
     let diagnostics = invalidLines.map(function (line) {
-        // return VSCodeLangServer.Diagnostic.create(
-        //     new VSCodeLangServer.Range.create(line, 1, line, Number.MAX_VALUE),
-        //     "This step is undefined",
-        //     1,
-        //     "1",
-        //     change.document.uri
-        // );
         return {
-            severity: VSCodeLangServer.DiagnosticSeverity.Warning,
+            severity: 1,
             range: {
-                start: { line: line, character: 1},
-                end: { line: 1, character: Number.MAX_VALUE }
+                start: { line: line - 1, character: 1},
+                end: { line: line - 1, character: Number.MAX_VALUE }
             },
-            message: `This step is undefined`,
-            source: 'ex'
+            message: `This step is undefined (line ${line})`,
+            // source: 'ex'
         }
     });
 
-    exec(`notify-send "invalid: ${invalidLines.join(',')}"`);
-    exec(`notify-send "invalid file: ${change.document.uri}"`);
+    // exec(`notify-send "invalid: ${invalidLines.join(',')}"`);
+    // exec(`notify-send "invalid file: ${change.document.uri}"`);
 
     connection.sendDiagnostics({
-        url: change.document.uri,
+        uri: change.document.uri,
         diagnostics: diagnostics
     });
 });
 
 connection.listen();
-exec(`notify-send "connection listening"`);
+// exec(`notify-send "connection listening"`);
