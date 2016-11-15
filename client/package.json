@@ -1,0 +1,46 @@
+{
+    "name": "behat-checker",
+    "displayName": "behat-checker",
+    "description": "",
+    "version": "0.0.1",
+    "author": "Luís Henrique Faria <luish.faria@gmail.com>",
+    "publisher": "beeblebrox3",
+    "engines": {
+        "vscode": "^1.5.0"
+    },
+    "categories": [
+        "Linters"
+    ],
+    "activationEvents": [
+        "onLanguage:feature",
+        "onLanguage:gherkin"
+    ],
+    "main": "./extension",
+    "contributes": {
+        "configuration": {
+            "type": "object",
+            "title": "Behat Checker Configuration",
+            "properties": {
+                "behatCheckerServer.configFile": {
+                    "type": "string",
+                    "default": "behat.yml",
+                    "description": "path to behat config file"
+                }
+            }
+        }
+    },
+    "scripts": {
+        "postinstall": "node ./node_modules/vscode/bin/install"
+    },
+    "devDependencies": {
+        "@types/mocha": "^2.2.32",
+        "@types/node": "^6.0.40",
+        "eslint": "^3.6.0",
+        "mocha": "^2.3.3",
+        "typescript": "^2.0.3",
+        "vscode": "^1.0.0"
+    },
+    "dependencies": {
+        "vscode-languageclient": "^2.6.2"
+    }
+}

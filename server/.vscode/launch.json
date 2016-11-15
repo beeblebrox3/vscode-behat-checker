@@ -1,0 +1,13 @@
+{
+	"version": "0.1.0",
+	"configurations": [
+		{
+			"name": "Attach",
+			"type": "node",
+			"request": "attach",
+			"port": 6199,
+			"sourceMaps": true,
+			"outDir": "/home/luis/projects/behat-linter/server"
+		}
+	]
+}
