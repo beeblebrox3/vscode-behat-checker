@@ -1,5 +1,5 @@
-let vscode = require("vscode");
-let vscodelangclient = require("vscode-languageclient");
+const vscode = require("vscode");
+const vscodelangclient = require("vscode-languageclient");
 const path = require("path");
 
 // this method is called when your extension is activated
@@ -7,10 +7,9 @@ const path = require("path");
 function activate(context) {
     vscode.window.showInformationMessage("extension activated :)");
 
-    let serverModule = context.asAbsolutePath(path.join('../server', 'index.js'));
-
-    let debugOptions = { execArgv: ["--nolazy", "--debug=6199"] };
-    let serverOptions = {
+    const serverModule = context.asAbsolutePath(path.join('../server', 'index.js'));
+    const debugOptions = { execArgv: ["--nolazy", "--debug=6199"] };
+    const serverOptions = {
         run : { module: serverModule, transport: vscodelangclient.TransportKind.ipc },
         debug: { module: serverModule, transport: vscodelangclient.TransportKind.ipc, options: debugOptions }
     }
@@ -21,21 +20,38 @@ function activate(context) {
         documentSelector: ["feature"],
         synchronize: {
             configurationSection: "behatCheckerServer",
-            // Synchronize the setting section 'languageServerExample' to the server
-            // configurationSection: 'languageServerExample',
-            // Notify the server about file changes to '.clientrc files contain in the workspace
             fileEvents: vscode.workspace.createFileSystemWatcher('**/.clientrc')
-        }
+        },
+        initializationOptions: function () {
+            let configuration = vscode.workspace.getConfiguration('behatChecker');
+            return {
+                configFile: configuration ? configuration.get('configFile', undefined) : undefined,
+                trigger: configuration ? configuration.get('trigger', undefined) : undefined,
+            };
+        }()
     }
 
-
     // Create the language client and start the client.
-    let disposable = new vscodelangclient.LanguageClient("Behat Checker", serverOptions, clientOptions);
-    disposable.start();
+    let client = new vscodelangclient.LanguageClient("Behat Checker", serverOptions, clientOptions);
+
+    client.onNotification("behatChecker.cacheUpdated", function () {
+        vscode.window.showInformationMessage("cache updated from server");
+    });
+
+    vscode.commands.registerCommand("behatChecker.updateCache", function () {
+        client.sendRequest("behatChecker.updateCache", {
+            x: "y"
+        }).then(function () {
+            vscode.window.showInformationMessage("yopa");
+        });
+        vscode.window.showInformationMessage("request update cache");
+    });
+
+    client.start();
 
     // Push the disposable to the context's subscriptions so that the 
     // client can be deactivated on extension deactivation
-    context.subscriptions.push(disposable);
+    context.subscriptions.push(client);
 }
 exports.activate = activate;
 

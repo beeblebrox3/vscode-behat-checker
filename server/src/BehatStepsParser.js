@@ -5,7 +5,6 @@ const trim = require("trim");
 
 class BehatStepsParser {
     constructor(projectDirectory, configFile = "behat.yml") {
-        exec(`notify-send "BehatStepsParser constructr"`);
         this.steps = [];
         this.projectDirectory = projectDirectory + DS;
         this.behatCMD = `php ${this.projectDirectory}vendor${DS}bin${DS}behat`;
@@ -16,7 +15,6 @@ class BehatStepsParser {
     updateStepsCache() {
         let out = execSync(`${this.behatCMD} -c ${this.configFile} -di ${this.projectDirectory}`).toString();
         this.parseSteps(out);
-        exec(`notify-send "BehatStepsParser updated"`);
     }
 
     parseSteps(rawSteps) {
@@ -52,7 +50,6 @@ class BehatStepsParser {
                 regex: regex,
                 context: context,
             });
-            // console.log(`parsed ${regex.step}`);
             return steps;
         }, []);
     }

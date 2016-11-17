@@ -3,7 +3,11 @@ const FeatureLinter = require("./src/FeatureLinter");
 const VSCodeLangServer = require("vscode-languageserver");
 const exec = require("child_process").exec;
 
-exec(`notify-send "start"`);
+const notify = function (str) {
+    exec(`notify-send "${str}"`);
+}
+
+notify("start");
 
 let connection = VSCodeLangServer.createConnection(
     new VSCodeLangServer.IPCMessageReader(process),
@@ -16,10 +20,38 @@ documents.listen(connection);
 let workspaceRoot;
 let BehatStepsParserInstance;
 let FeatureLinterInstance;
+let settings = {
+    trigger: "onChange",
+    configFile: "behat.yml"
+};
 connection.onInitialize(function (params) {
     workspaceRoot = params.rootPath;
-    BehatStepsParserInstance = new BehatStepsParser(workspaceRoot);
+    settings.trigger = params.initializationOptions.trigger || settings.trigger;
+    settings.configFile = params.initializationOptions.configFile || settings.configFile;
+
+    BehatStepsParserInstance = new BehatStepsParser(workspaceRoot, settings.configFile);
     FeatureLinterInstance = new FeatureLinter(BehatStepsParserInstance);
+
+
+    const method = settings.trigger === "onChange" ? "onDidChangeContent" : "onDidSave";
+    documents[method]((change) => {
+        let invalidLines = FeatureLinterInstance.lint(change.document.getText());
+        let diagnostics = invalidLines.map(function (line) {
+            return {
+                severity: 1,
+                range: {
+                    start: { line: line - 1, character: 1},
+                    end: { line: line - 1, character: Number.MAX_VALUE }
+                },
+                message: `This step is undefined (line ${line})`,
+            }
+        });
+
+        connection.sendDiagnostics({
+            uri: change.document.uri,
+            diagnostics: diagnostics
+        });
+    });
 
     return {
         capabilities: {
@@ -28,30 +60,9 @@ connection.onInitialize(function (params) {
     }
 });
 
-// documents.onDidSave((change) => {
-documents.onDidChangeContent((change) => {
-    // exec(`notify-send "content changed"`);
-    let invalidLines = FeatureLinterInstance.lint(change.document.getText());
-    let diagnostics = invalidLines.map(function (line) {
-        return {
-            severity: 1,
-            range: {
-                start: { line: line - 1, character: 1},
-                end: { line: line - 1, character: Number.MAX_VALUE }
-            },
-            message: `This step is undefined (line ${line})`,
-            // source: 'ex'
-        }
-    });
-
-    // exec(`notify-send "invalid: ${invalidLines.join(',')}"`);
-    // exec(`notify-send "invalid file: ${change.document.uri}"`);
-
-    connection.sendDiagnostics({
-        uri: change.document.uri,
-        diagnostics: diagnostics
-    });
+connection.onRequest("behatChecker.updateCache", function () {
+    notify("requested update cache");
+    connection.sendNotification("behatChecker.cacheUpdated", {});
 });
 
 connection.listen();
-// exec(`notify-send "connection listening"`);
