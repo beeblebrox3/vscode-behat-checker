@@ -34,17 +34,10 @@ function activate(context) {
     // Create the language client and start the client.
     let client = new vscodelangclient.LanguageClient("Behat Checker", serverOptions, clientOptions);
 
-    client.onNotification("behatChecker.cacheUpdated", function () {
-        vscode.window.showInformationMessage("cache updated from server");
-    });
-
     vscode.commands.registerCommand("behatChecker.updateCache", function () {
-        client.sendRequest("behatChecker.updateCache", {
-            x: "y"
-        }).then(function () {
-            vscode.window.showInformationMessage("yopa");
+        client.sendRequest({method: "behatChecker.updateCache"}).then(function () {
+            vscode.window.showInformationMessage("Steps cache updated!");
         });
-        vscode.window.showInformationMessage("request update cache");
     });
 
     client.start();

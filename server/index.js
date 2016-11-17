@@ -60,9 +60,10 @@ connection.onInitialize(function (params) {
     }
 });
 
-connection.onRequest("behatChecker.updateCache", function () {
+connection.onRequest({method: "behatChecker.updateCache"}, function () {
     notify("requested update cache");
-    connection.sendNotification("behatChecker.cacheUpdated", {});
+    BehatStepsParserInstance.updateStepsCache();
+    connection.sendNotification({method: "behatChecker.cacheUpdated"}, {});
 });
 
 connection.listen();
