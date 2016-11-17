@@ -7,7 +7,7 @@ const path = require("path");
 function activate(context) {
     vscode.window.showInformationMessage("extension activated :)");
 
-    const serverModule = context.asAbsolutePath(path.join('../server', 'index.js'));
+    const serverModule = context.asAbsolutePath(path.join('server', 'index.js'));
     const debugOptions = { execArgv: ["--nolazy", "--debug=6199"] };
     const serverOptions = {
         run : { module: serverModule, transport: vscodelangclient.TransportKind.ipc },

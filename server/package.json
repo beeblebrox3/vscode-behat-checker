@@ -1,15 +1,18 @@
 {
-  "name": "behat-checker-server",
-	"description": "",
-	"version": "0.0.1",
-	"author": "Luís Henrique Faria <luish.faria@gmail.com>",
-	"license": "MIT",
-	"engines": {
-		"node": "*"
-	},
-  "dependencies": {
-    "gherkin": "^4.0.0",
-    "trim": "^0.0.1",
-    "vscode-languageserver": "^2.6.1"
-  }
+    "name": "behat-checker-server",
+    "description": "",
+    "version": "0.0.1",
+    "author": "Luís Henrique Faria <luish.faria@gmail.com>",
+    "license": "MIT",
+    "engines": {
+        "node": "*"
+    },
+    "dependencies": {
+        "gherkin": "^4.0.0",
+        "trim": "^0.0.1",
+        "vscode-languageserver": "^2.6.1"
+    },
+    "scripts": {
+        "prepublish": "cp -R ./ ../client/server"
+    }
 }

@@ -40,6 +40,7 @@
         }]
     },
     "scripts": {
+        "vscode:prepublish": "",
         "postinstall": "node ./node_modules/vscode/bin/install"
     },
     "devDependencies": {

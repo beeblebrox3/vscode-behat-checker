@@ -63,6 +63,12 @@ class BehatStepsParser {
             }
             let argFormat = '"([^"]*)"';
             stepRegex = stepRegex.replace(/:arg(\d+)/g, argFormat);
+            if (stepRegex[0] !== "^") {
+                stepRegex = `^${stepRegex}`;
+            }
+            if (stepRegex[stepRegex.length - 1] !== "$") {
+                stepRegex += "$";
+            }
             stepRegex = new RegExp(stepRegex);
             if (stepRegex.exec(stepText)) {
                 return true;
