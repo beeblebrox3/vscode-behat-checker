@@ -61,6 +61,8 @@ class BehatStepsParser {
             if (stepRegex[0] === "/") {
                 stepRegex = stepRegex.substr(1, stepRegex.length - 2)
             }
+            let argFormat = '"([^"]*)"';
+            stepRegex = stepRegex.replace(/:arg(\d+)/g, argFormat);
             stepRegex = new RegExp(stepRegex);
             if (stepRegex.exec(stepText)) {
                 return true;
