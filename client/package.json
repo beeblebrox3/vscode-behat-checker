@@ -24,12 +24,12 @@
             "properties": {
                 "behatChecker.configFile": {
                     "type": "string",
-                    "default": "behat.yml",
+                    "default": "config/behat.yml",
                     "description": "path to behat config file"
                 },
                 "behatChecker.trigger": {
                     "type": "string",
-                    "default": "onChange",
+                    "default": "onSave",
                     "description": "When to lint the file (onChange or onSave)"
                 }
             }

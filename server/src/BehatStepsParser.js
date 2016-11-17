@@ -37,9 +37,13 @@ class BehatStepsParser {
                 step: trim(matches[3])
             };
 
-            let regexContextFinder = /at \`([a-zA-Z-_\\]+)::([a-zA-Z-_]+)\(\)/;
+            let regexContextFinder = /at \`([a-zA-Z-_\\]+)::([a-zA-ZÀ-úÀ-ÿ-_]+)\(\)/;
             let lastLine = lines[lines.length - 1];
             matches = regexContextFinder.exec(lastLine);
+            if (!matches || matches.length < 3) {
+                // if the method name has accents may don't match
+                return steps;
+            }
             let context = {
                 className: matches[1],
                 methodName: matches[2]
@@ -69,9 +73,16 @@ class BehatStepsParser {
             if (stepRegex[stepRegex.length - 1] !== "$") {
                 stepRegex += "$";
             }
-            stepRegex = new RegExp(stepRegex);
-            if (stepRegex.exec(stepText)) {
-                return true;
+
+            // remove argument name
+            stepRegex = stepRegex.replace(/\?P\<(.+)\>/gi, '');
+            try {
+                stepRegex = new RegExp(stepRegex);
+                if (stepRegex.exec(stepText)) {
+                    return true;
+                }
+            } catch (e) {
+                console.log("bad regex: " + stepRegex);
             }
         }
         return false;
