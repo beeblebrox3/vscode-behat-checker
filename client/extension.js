@@ -1,11 +1,17 @@
+"use strict";
+
 const vscode = require("vscode");
 const vscodelangclient = require("vscode-languageclient");
 const path = require("path");
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
-function activate(context) {
-    vscode.window.showInformationMessage("extension activated :)");
+let extensionUserConfig = vscode.workspace.getConfiguration("behatChecker");
+let debug = extensionUserConfig.get("debug", false);
+
+// show notification if debug is enabled
+const notify = str => !debug || vscode.window.showInformationMessage(str);
+
+exports.activate = context => {
+    !debug || vscode.window.showInformationMessage("Behat Checker Activated");
 
     const serverModule = context.asAbsolutePath(path.join('server', 'index.js'));
     const debugOptions = { execArgv: ["--nolazy", "--debug=6199"] };
@@ -14,41 +20,45 @@ function activate(context) {
         debug: { module: serverModule, transport: vscodelangclient.TransportKind.ipc, options: debugOptions }
     }
 
-    // Options to control the language client
-    let clientOptions = {
-        // Register the server for plain text documents
+    const clientOptions = {
         documentSelector: ["feature"],
         synchronize: {
             configurationSection: "behatCheckerServer",
             fileEvents: vscode.workspace.createFileSystemWatcher('**/.clientrc')
         },
-        initializationOptions: function () {
-            let configuration = vscode.workspace.getConfiguration('behatChecker');
-            return {
-                configFile: configuration ? configuration.get('configFile', undefined) : undefined,
-                trigger: configuration ? configuration.get('trigger', undefined) : undefined,
-            };
-        }()
+        initializationOptions: {
+            configFile: extensionUserConfig.get("configFile"),
+            trigger: extensionUserConfig.get("trigger"),
+            debug: extensionUserConfig.get("debug")
+        }
     }
 
-    // Create the language client and start the client.
     let client = new vscodelangclient.LanguageClient("Behat Checker", serverOptions, clientOptions);
-
-    vscode.commands.registerCommand("behatChecker.updateCache", function () {
-        client.sendRequest({method: "behatChecker.updateCache"}).then(function () {
+    let updateCacheDisponsable = vscode.commands.registerCommand("behatChecker.updateCache", () => {
+        notify("requesting steps cache update");
+        client.sendRequest({method: "behatChecker.updateCache"}).then(() => {
             vscode.window.showInformationMessage("Steps cache updated!");
+        });
+    });
+
+    let validateDisponsable = vscode.commands.registerCommand("behatChecker.validate", () => {
+        // @todo how to check if the current file is an feature file?
+        if (!vscode.window.activeTextEditor) {
+            vscode.window.showWarningMessage("Open an feature file to use this command.");
+            return;
+        }
+        notify("requesting validation");
+        client.sendRequest({method: "behatChecker.validate"}, {}).then(() => {
+            notify("Validated")
         });
     });
 
     client.start();
 
-    // Push the disposable to the context's subscriptions so that the 
-    // client can be deactivated on extension deactivation
     context.subscriptions.push(client);
-}
-exports.activate = activate;
+    context.subscriptions.push(updateCacheDisponsable);
+    context.subscriptions.push(validateDisponsable);
+} 
 
-// this method is called when your extension is deactivated
-function deactivate() {
+exports.deactivate = () => {
 }
-exports.deactivate = deactivate;
