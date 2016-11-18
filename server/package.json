@@ -14,5 +14,8 @@
     },
     "scripts": {
         "prepublish": "cp -R ./ ../client/server"
+    },
+    "devDependencies": {
+        "winston": "^2.3.0"
     }
 }
