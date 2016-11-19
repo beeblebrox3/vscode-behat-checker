@@ -1,10 +1,11 @@
 const BehatStepsParser = require("./src/BehatStepsParser");
 const FeatureLinter = require("./src/FeatureLinter");
 const VSCodeLangServer = require("vscode-languageserver");
-const exec = require("child_process").exec;
 const winston = require("winston");
 const fs = require("fs");
-const logfile = __dirname + "/behatchecker.log";
+const path = require("path");
+const logfile = path.join("behatchecker.log");
+
 winston.level = process.env.LOG_LEVEL;
 winston.add(winston.transports.File, { filename: logfile });
 

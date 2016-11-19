@@ -1,22 +1,33 @@
-const fs = require("fs");
 const gherkin = require("gherkin");
 const parser = new gherkin.Parser();
 
+/**
+ * Class responsible for check feature files or single steps
+ *
+ * @class FeatureLinter
+ */
 class FeatureLinter {
     /**
-     *
      * @param {BehatStepsParser} stepsParser
      */
     constructor(stepsParser) {
         this.stepsParser = stepsParser;
     }
 
+    /**
+     * Checks entire feature for undefined steps
+     *
+     * @param {string} feature the content of the feature file
+     * @returns {Array} array with the number of the invalid lines
+     *
+     * @memberOf FeatureLinter
+     */
     lint(feature) {
         let invalidSteps = [];
         let ast = parser.parse(feature);
 
-        ast.feature.children.map((scenario, indexScenario) => {
-            scenario.steps.map((step, indexStep) => {
+        ast.feature.children.map((scenario) => {
+            scenario.steps.map((step) => {
                 if (!this.validateStep(step.text)) {
                     invalidSteps.push(step.location.line);
                 }
@@ -26,6 +37,14 @@ class FeatureLinter {
         return invalidSteps;
     }
 
+    /**
+     * Validade an step
+     *
+     * @param {String} step
+     * @returns {Boolean}
+     *
+     * @memberOf FeatureLinter
+     */
     validateStep(step) {
         const steps = this.stepsParser.steps;
         let stepsCount = steps.length;
