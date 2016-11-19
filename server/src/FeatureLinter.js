@@ -1,13 +1,11 @@
 const fs = require("fs");
 const gherkin = require("gherkin");
 const parser = new gherkin.Parser();
-const BehatStepsParser = require("./BehatStepsParser");
 
 class FeatureLinter {
     /**
      *
      * @param {BehatStepsParser} stepsParser
-     * @param feature
      */
     constructor(stepsParser) {
         this.stepsParser = stepsParser;
@@ -15,18 +13,30 @@ class FeatureLinter {
 
     lint(feature) {
         let invalidSteps = [];
-        let self = this;
         let ast = parser.parse(feature);
 
-        ast.feature.children.map(function (scenario, indexScenario) {
-            scenario.steps.map(function (step, indexStep) {
-                if (!self.stepsParser.check(step.text, step.argument, step.keyword)) {
+        ast.feature.children.map((scenario, indexScenario) => {
+            scenario.steps.map((step, indexStep) => {
+                if (!this.validateStep(step.text)) {
                     invalidSteps.push(step.location.line);
                 }
-            });
+            })
         });
 
         return invalidSteps;
+    }
+
+    validateStep(step) {
+        const steps = this.stepsParser.steps;
+        let stepsCount = steps.length;
+
+        for (let i = 0; i < stepsCount; i++) {
+            let stepRegex = new RegExp(steps[i].regex.step);
+            if (stepRegex.exec(step)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 

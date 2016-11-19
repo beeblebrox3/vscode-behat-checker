@@ -1,0 +1,6 @@
+{
+    "collectCoverage": true,
+    "collectCoverageFrom": ["src/*.js"],
+    "coverageDirectory": "coverage-report",
+    "notify": true
+}

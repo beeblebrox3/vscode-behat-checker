@@ -1,0 +1,38 @@
+default   | [When|*] I do something simple
+          | at `FeatureContext::someMethod()`
+
+suitetwo  | [When|*] I do something simple on other suite
+          | at `FeatureContext::someMethod()`
+
+default   | [When|*] I do something simple with an argument :arg1
+          | at `FeatureContext::someMethod()`
+
+default   | [When|*] I do something simple with an named argument :named1
+          | at `FeatureContext::someMethod()`
+
+default   | [Then|*] I do something simple with two arguments :arg1 :arg2
+          | at `FeatureContext::someMethod()`
+
+default   | [When|*] I do something simple with two named arguments :named1 :other2
+          | at `FeatureContext::someMethod()`
+
+default   | [Then|*] /^I do something with regex (\d+)$/
+          | at `FeatureContext::someMethod()`
+
+default   | [When|*] /^I do something with regex and two args "([^"]*)" "([^"]*)"$/
+          | at `FeatureContext::someMethod()`
+
+default   | [When|*] /^I do somethign with invalid regex (yopa$/
+          | at `FeatureContext::someMethod()`
+
+default   | [When|*] /^I do something with (?:|optional )argument$/
+          | at `FeatureContext::someMethod()`
+
+default   | [When|*] /^I do something with (?:|optional |opt )argument$/
+          | at `FeatureContext::someMethod()`
+
+default   | [Then|*] /^I do something with different (options|choices)$/
+          | at `FeatureContext::someMethod()`
+
+default   | [Then|*] /^I do something with an ugly argument "(?<theuglyargument>.*)"$/
+          | at `FeatureContext::someMethod()`

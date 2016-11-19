@@ -8,14 +8,17 @@
         "node": "*"
     },
     "dependencies": {
-        "gherkin": "^4.0.0",
-        "trim": "^0.0.1",
+        "gherkin": "cucumber/gherkin-javascript#master",
+        "super-trim": "^1.0.0",
         "vscode-languageserver": "^2.6.1"
     },
     "scripts": {
-        "prepublish": "cp -R ./ ../client/server"
+        "prepublish": "cp -R ./ ../client/server",
+        "test": "jest --config .jest-config.json",
+        "test-watch": "jest --config .jest-config.json --watch"
     },
     "devDependencies": {
+        "jest": "^17.0.3",
         "winston": "^2.3.0"
     }
 }

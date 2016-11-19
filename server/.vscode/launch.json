@@ -8,6 +8,21 @@
             "port": 6199,
             "sourceMaps": true,
             "outDir": "${workspaceRoot}/../client/server"
+        },
+        {
+            "name": "Test",
+            "type": "node",
+            "request": "launch",
+            "port": 5858,
+            "runtimeArgs": [
+                "--harmony"
+            ],
+            "args": [
+                "${workspaceRoot}/__tests__/FeatureLinter.test.js",
+                "--runInBand"
+            ],
+            "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
+            "cwd": "${workspaceRoot}",
         }
     ]
 }
