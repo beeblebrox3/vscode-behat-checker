@@ -1,7 +1,7 @@
 const execSync = require('child_process').execSync;
 const DS = "/";
 const trim = require("super-trim");
-const winston = require("winston");
+
 
 /**
  * Class responsible for intereact with behat CLI and parse the output to detect
@@ -178,7 +178,6 @@ class BehatStepsParser {
             return regex;
         } catch (e) {
             let errorMessage = `Invalid regex. Input: ${step} | Output: ${regex}`;
-            winston.error(errorMessage);
             throw new Error(errorMessage);
         }
     }

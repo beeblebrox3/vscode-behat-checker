@@ -2,7 +2,7 @@
 
 This is an vscode extension to work with [Behat](http://behat.org). It aims to allow people that doesn't use PHPStorm to have a decent tool to write features ;)
 
-![demo](images/vscode-behat-checker.gif "Demonstration")
+![demo](https://github.com/beeblebrox3/vscode-behat-checker/raw/master/client/images/vscode-behat-checker.gif "Demonstration")
 
 It depends of `Cucumber (Gherkin) Syntax and Snippets` extension. For now ;)
 

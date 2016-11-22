@@ -58,7 +58,7 @@
             },
             {
                 "command": "behatChecker.reload",
-                "title": "Reload the extension server"
+                "title": "Reload behat checker server"
             }
         ],
         "keybindings": [
@@ -68,7 +68,7 @@
             },
             {
                 "key": "ctrl+alt+l",
-                "command": "behatChecker.validate"
+                "command": "behatChecker.reload"
             }
         ]
     },

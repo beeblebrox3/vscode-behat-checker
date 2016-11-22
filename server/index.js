@@ -1,19 +1,15 @@
 const BehatStepsParser = require("./src/BehatStepsParser");
 const FeatureLinter = require("./src/FeatureLinter");
 const VSCodeLangServer = require("vscode-languageserver");
-const winston = require("winston");
-const fs = require("fs");
 const path = require("path");
-const logfile = path.join("behatchecker.log");
-
-winston.level = process.env.LOG_LEVEL;
-winston.add(winston.transports.File, { filename: logfile });
 
 let connection = VSCodeLangServer.createConnection(
     new VSCodeLangServer.IPCMessageReader(process),
     new VSCodeLangServer.IPCMessageWriter(process)
 );
-winston.log("debug", "connection created");
+
+// @todo make it external
+const llog = (str, type = "info") => connection.console.log(`[${type}] ${str}`);
 
 let documents = new VSCodeLangServer.TextDocuments();
 documents.listen(connection);
@@ -23,23 +19,25 @@ let BehatStepsParserInstance;
 let FeatureLinterInstance;
 let settings = {
     trigger: "onChange",
-    configFile: "behat.yml"
+    configFile: "behat.yml",
+    debug: false
 };
+
 let listenerDisposable;
 connection.onInitialize(function (params) {
-    winston.log("debug", "connection initialize");
+    llog("connection initialize", "debug");
 
     workspaceRoot = params.rootPath;
     settings.trigger = params.initializationOptions.trigger || settings.trigger;
     settings.configFile = params.initializationOptions.configFile || settings.configFile;
 
-    winston.log("debug", `workspaceRoot: ${workspaceRoot}`);
-    winston.log("debug", "config", settings);
+    llog(`workspaceRoot: ${workspaceRoot}`, "debug");
+    llog(`seggints: ${JSON.stringify(settings)}`, "debug");
 
     BehatStepsParserInstance = new BehatStepsParser(workspaceRoot, settings.configFile);
     FeatureLinterInstance = new FeatureLinter(BehatStepsParserInstance);
 
-    winston.log("debug", "Parsed steps", BehatStepsParserInstance.steps);
+    llog(`Parsed steps: ${JSON.stringify(BehatStepsParserInstance.steps)}`, "log");
 
     configureListener();
 
@@ -51,24 +49,19 @@ connection.onInitialize(function (params) {
 });
 
 connection.onRequest({method: "behatChecker.updateCache"}, function () {
-    winston.log("debug", "requested update cache");
     BehatStepsParserInstance.updateStepsCache();
     connection.sendNotification({method: "behatChecker.cacheUpdated"}, {});
-    winston.log("debug", "cache updated");
-    winston.log("debug", "steps", BehatStepsParserInstance.steps);
-});
-
-connection.onRequest({method: "behatChecker.clearLogs"}, function () {
-    fs.unlinkSync(logfile);
-    connection.sendNotification({method: "behatChecker.logsClean"}, {});
+    llog(`Parsed steps: ${JSON.stringify(BehatStepsParserInstance.steps)}`, "log");
 });
 
 connection.onRequest({method: "behatChecker.reload"}, function () {
     BehatStepsParserInstance = new BehatStepsParser(workspaceRoot, settings.configFile);
     FeatureLinterInstance = new FeatureLinter(BehatStepsParserInstance);
+    llog(`Parsed steps: ${JSON.stringify(BehatStepsParserInstance.steps)}`, "log");
 });
 
 connection.onDidChangeConfiguration((param) => {
+    llog("configuration did changed", "debug");
     settings.configFile = param.settings.behatChecker.configFile || settings.configFile;
     settings.trigger = param.settings.behatChecker.trigger || settings.trigger;
     settings.debug = param.settings.behatChecker.debug || settings.debug;
@@ -79,7 +72,7 @@ connection.onDidChangeConfiguration((param) => {
 
 function validate(document) {
     let invalidLines = FeatureLinterInstance.lint(document.getText());
-    winston.log("debug", "invalid lines", invalidLines);
+    llog(`invalid lines: ${invalidLines.join(",")}`, "debug");
 
     let diagnostics = invalidLines.map(function (line) {
         return {
@@ -105,6 +98,6 @@ function configureListener() {
 
     let eventName = settings.trigger === "onChange" ? "onDidChangeContent" : "onDidSave";
     listenerDisposable = documents[eventName]((change) => validate(change.document));
-    winston.log("debug", "listen to method: " + eventName);
+    llog(`listen event ${eventName}`, "debug");
 }
 connection.listen();

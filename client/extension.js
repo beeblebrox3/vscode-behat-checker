@@ -41,18 +41,6 @@ exports.activate = context => {
         });
     });
 
-    let validateDisponsable = vscode.commands.registerCommand("behatChecker.validate", () => {
-        // @todo how to check if the current file is an feature file?
-        if (!vscode.window.activeTextEditor) {
-            vscode.window.showWarningMessage("Open an feature file to use this command.");
-            return;
-        }
-        notify("requesting validation");
-        client.sendRequest({method: "behatChecker.validate"}, {}).then(() => {
-            notify("Validated")
-        });
-    });
-
     let reloadDisponsable = vscode.commands.registerCommand("behatChecker.reload", () => {
         client.sendRequest({method: "behatChecker.reload"}, {}).then(() =>{
             notify("Reloaded!");
@@ -63,7 +51,7 @@ exports.activate = context => {
 
     context.subscriptions.push(client);
     context.subscriptions.push(updateCacheDisponsable);
-    context.subscriptions.push(validateDisponsable);
+    context.subscriptions.push(reloadDisponsable);
 } 
 
 exports.deactivate = () => {
