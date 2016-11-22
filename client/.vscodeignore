@@ -1,0 +1,9 @@
+.vscode-test/**
+test/**
+server/__tests__
+server/__mocks__
+server/.idea
+server/.vscode
+server/coverage-report
+server/.jest-config.json
+server/.eslingrc.json

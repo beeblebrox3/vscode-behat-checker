@@ -13,7 +13,6 @@
         "vscode-languageserver": "^2.6.1"
     },
     "scripts": {
-        "prepublish": "cp -R ./ ../client/server",
         "test": "jest --config .jest-config.json",
         "test-watch": "jest --config .jest-config.json --watch"
     },
