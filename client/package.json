@@ -1,21 +1,29 @@
 {
     "name": "behat-checker",
-    "displayName": "behat-checker",
-    "description": "This is an VSCode extension to help you write feature files when using behat",
+    "displayName": "Behat Checker",
+    "description": "Extension to help you identify undefined steps on feature files (for behat)",
     "repository": {
         "type": "git",
         "url": "https://github.com/beeblebrox3/vscode-behat-checker"
     },
     "license": "MIT",
-    "version": "0.2.0",
+    "version": "1.0.0",
     "author": "Luís Henrique Faria <luish.faria@gmail.com>",
     "publisher": "beeblebrox3",
     "engines": {
         "vscode": "^1.5.0"
     },
     "categories": [
-        "Linters"
+        "Linters",
+        "Other"
     ],
+    "keywords": [
+        "behat",
+        "php",
+        "gherkin",
+        "cucumber"
+    ],
+    "preview": true,
     "activationEvents": [
         "onLanguage:feature",
         "onLanguage:gherkin"
