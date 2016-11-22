@@ -48,7 +48,7 @@ describe("make regex", () => {
             ["/^simple (?:|optional )$/", "^simple (?:|optional )$"],
             ["/simple (?:|optional | opt )$/", "simple (?:|optional | opt )$"],
             ["/^simple (options|choices)/", "^simple (options|choices)"],
-            ['/^simple "(?<theuglyargument>.*)"$/', '^simple "(.*)"$'],
+            ['/^simple "(?P<theuglyargument>.*)"$/', '^simple "(.*)"$'],
         ];
 
         exampleData.map(config => {

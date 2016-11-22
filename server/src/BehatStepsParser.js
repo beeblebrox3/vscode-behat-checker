@@ -171,14 +171,15 @@ class BehatStepsParser {
         regex = regex.replace(/:([a-zA-Z+]+)(\d+)/g, argFormat);
 
         // remove argument name from regex
-        regex = regex.replace(/\?\<([a-zA-Z0-9]+)\>/g, "");
+        regex = regex.replace(/\?P?\<([a-zA-Z0-9]+)\>/g, "");
 
         try {
             new RegExp(regex);
             return regex;
         } catch (e) {
-            winston.error(`Invalid regex. Input: ${step} | Output: ${regex}`);
-            throw new Error("Invalid regex");
+            let errorMessage = `Invalid regex. Input: ${step} | Output: ${regex}`;
+            winston.error(errorMessage);
+            throw new Error(errorMessage);
         }
     }
 }

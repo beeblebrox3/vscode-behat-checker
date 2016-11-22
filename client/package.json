@@ -2,8 +2,12 @@
     "name": "behat-checker",
     "displayName": "behat-checker",
     "description": "This is an VSCode extension to help you write feature files when using behat",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/beeblebrox3/vscode-behat-checker"
+    },
     "license": "MIT",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "author": "Luís Henrique Faria <luish.faria@gmail.com>",
     "publisher": "beeblebrox3",
     "engines": {
@@ -39,20 +43,26 @@
                 }
             }
         },
-        "commands": [{
-            "command": "behatChecker.updateCache",
-            "title": "Update steps cache"
-        }, {
-            "command": "behatChecker.validate",
-            "title": "Manual validation of current file"
-        }],
-        "keybindings": [{
-            "key": "ctrl+alt+p",
-            "command": "behatChecker.updateCache"
-        }, {
-            "key": "ctrl+alt+l",
-            "command": "behatChecker.validate"
-        }]
+        "commands": [
+            {
+                "command": "behatChecker.updateCache",
+                "title": "Update steps cache"
+            },
+            {
+                "command": "behatChecker.reload",
+                "title": "Reload the extension server"
+            }
+        ],
+        "keybindings": [
+            {
+                "key": "ctrl+alt+p",
+                "command": "behatChecker.updateCache"
+            },
+            {
+                "key": "ctrl+alt+l",
+                "command": "behatChecker.validate"
+            }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "cp -R ../server ./server",

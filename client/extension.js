@@ -23,7 +23,7 @@ exports.activate = context => {
     const clientOptions = {
         documentSelector: ["feature"],
         synchronize: {
-            configurationSection: "behatCheckerServer",
+            configurationSection: "behatChecker",
             fileEvents: vscode.workspace.createFileSystemWatcher('**/.clientrc')
         },
         initializationOptions: {
@@ -50,6 +50,12 @@ exports.activate = context => {
         notify("requesting validation");
         client.sendRequest({method: "behatChecker.validate"}, {}).then(() => {
             notify("Validated")
+        });
+    });
+
+    let reloadDisponsable = vscode.commands.registerCommand("behatChecker.reload", () => {
+        client.sendRequest({method: "behatChecker.reload"}, {}).then(() =>{
+            notify("Reloaded!");
         });
     });
 

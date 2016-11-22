@@ -25,6 +25,7 @@ let settings = {
     trigger: "onChange",
     configFile: "behat.yml"
 };
+let listenerDisposable;
 connection.onInitialize(function (params) {
     winston.log("debug", "connection initialize");
 
@@ -40,28 +41,7 @@ connection.onInitialize(function (params) {
 
     winston.log("debug", "Parsed steps", BehatStepsParserInstance.steps);
 
-    const method = settings.trigger === "onChange" ? "onDidChangeContent" : "onDidSave";
-    winston.log("debug", "listen to method: " + method);
-    documents[method]((change) => {
-        let invalidLines = FeatureLinterInstance.lint(change.document.getText());
-        winston.log("debug", "invalid lines", invalidLines);
-
-        let diagnostics = invalidLines.map(function (line) {
-            return {
-                severity: 1,
-                range: {
-                    start: { line: line - 1, character: 1},
-                    end: { line: line - 1, character: Number.MAX_VALUE }
-                },
-                message: `This step is undefined (line ${line})`,
-            }
-        });
-
-        connection.sendDiagnostics({
-            uri: change.document.uri,
-            diagnostics: diagnostics
-        });
-    });
+    configureListener();
 
     return {
         capabilities: {
@@ -83,4 +63,48 @@ connection.onRequest({method: "behatChecker.clearLogs"}, function () {
     connection.sendNotification({method: "behatChecker.logsClean"}, {});
 });
 
+connection.onRequest({method: "behatChecker.reload"}, function () {
+    BehatStepsParserInstance = new BehatStepsParser(workspaceRoot, settings.configFile);
+    FeatureLinterInstance = new FeatureLinter(BehatStepsParserInstance);
+});
+
+connection.onDidChangeConfiguration((param) => {
+    settings.configFile = param.settings.behatChecker.configFile || settings.configFile;
+    settings.trigger = param.settings.behatChecker.trigger || settings.trigger;
+    settings.debug = param.settings.behatChecker.debug || settings.debug;
+    BehatStepsParserInstance.updateConfig(workspaceRoot, settings.configFile);
+    BehatStepsParserInstance.updateStepsCache();
+    configureListener();
+});
+
+function validate(document) {
+    let invalidLines = FeatureLinterInstance.lint(document.getText());
+    winston.log("debug", "invalid lines", invalidLines);
+
+    let diagnostics = invalidLines.map(function (line) {
+        return {
+            severity: 1,
+            range: {
+                start: { line: line - 1, character: 1},
+                end: { line: line - 1, character: Number.MAX_VALUE }
+            },
+            message: `This step is undefined (line ${line})`,
+        }
+    });
+
+    connection.sendDiagnostics({
+        uri: document.uri,
+        diagnostics: diagnostics
+    });
+}
+
+function configureListener() {
+    if (listenerDisposable && listenerDisposable.dispose) {
+        listenerDisposable.dispose();
+    }
+
+    let eventName = settings.trigger === "onChange" ? "onDidChangeContent" : "onDidSave";
+    listenerDisposable = documents[eventName]((change) => validate(change.document));
+    winston.log("debug", "listen to method: " + eventName);
+}
 connection.listen();
