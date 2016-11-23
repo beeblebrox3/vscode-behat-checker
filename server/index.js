@@ -68,6 +68,7 @@ connection.onDidChangeConfiguration((param) => {
     BehatStepsParserInstance.updateConfig(workspaceRoot, settings.configFile);
     BehatStepsParserInstance.updateStepsCache();
     configureListener();
+    configureAutoUpdateListener();
 });
 
 function validate(document) {
@@ -100,4 +101,19 @@ function configureListener() {
     listenerDisposable = documents[eventName]((change) => validate(change.document));
     llog(`listen event ${eventName}`, "debug");
 }
+
+function configureAutoUpdateListener() {
+    let disposable = documents.onDidSave((change) => {
+        if (change.document.languageId === "php") {
+            BehatStepsParserInstance.updateStepsCache();
+            llog("PHP file saved, cache updated", "info");
+
+            documents.all().map((document) => {
+                llog(`Validating document ${document.uri}`);
+                validate(document);
+            });
+        }
+    });
+}
+
 connection.listen();

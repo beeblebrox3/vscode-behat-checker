@@ -21,7 +21,7 @@ exports.activate = context => {
     }
 
     const clientOptions = {
-        documentSelector: ["feature"],
+        documentSelector: ["feature", "php"],
         synchronize: {
             configurationSection: "behatChecker",
             fileEvents: vscode.workspace.createFileSystemWatcher('**/.clientrc')
