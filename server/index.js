@@ -72,6 +72,11 @@ connection.onDidChangeConfiguration((param) => {
 });
 
 function validate(document) {
+    const supportedLanguages = ["feature", "gherkin"];
+    if (supportedLanguages.indexOf(document.languageId) === -1) {
+        return;
+    }
+
     let invalidLines = FeatureLinterInstance.lint(document.getText());
     llog(`invalid lines: ${invalidLines.join(",")}`, "debug");
 

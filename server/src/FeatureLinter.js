@@ -24,17 +24,21 @@ class FeatureLinter {
      */
     lint(feature) {
         let invalidSteps = [];
-        let ast = parser.parse(feature);
+        try {
+            let ast = parser.parse(feature);
 
-        ast.feature.children.map((scenario) => {
-            scenario.steps.map((step) => {
-                if (!this.validateStep(step.text)) {
-                    invalidSteps.push(step.location.line);
-                }
-            })
-        });
+            ast.feature.children.map((scenario) => {
+                scenario.steps.map((step) => {
+                    if (!this.validateStep(step.text)) {
+                        invalidSteps.push(step.location.line);
+                    }
+                })
+            });
 
-        return invalidSteps;
+            return invalidSteps;
+        } catch (e) {
+            return [];
+        }
     }
 
     /**
