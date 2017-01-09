@@ -13,7 +13,7 @@ const notify = str => !debug || vscode.window.showInformationMessage(str);
 exports.activate = context => {
     !debug || vscode.window.showInformationMessage("Behat Checker Activated");
 
-    const serverModule = context.asAbsolutePath(path.join('server', 'index.js'));
+    const serverModule = context.asAbsolutePath(path.join('../server', 'index.js'));
     const debugOptions = { execArgv: ["--nolazy", "--debug=6199"] };
     const serverOptions = {
         run : { module: serverModule, transport: vscodelangclient.TransportKind.ipc },

@@ -10,7 +10,7 @@
     "dependencies": {
         "gherkin": "cucumber/gherkin-javascript#master",
         "super-trim": "^1.0.0",
-        "vscode-languageserver": "^2.6.1"
+        "vscode-languageserver": "^2.6.2"
     },
     "scripts": {
         "test": "jest --config .jest-config.json",

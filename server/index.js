@@ -11,6 +11,8 @@ let connection = VSCodeLangServer.createConnection(
 // @todo make it external
 const llog = (str, type = "info") => connection.console.log(`[${type}] ${str}`);
 
+let completionItens = [];
+
 let documents = new VSCodeLangServer.TextDocuments();
 documents.listen(connection);
 
@@ -39,11 +41,15 @@ connection.onInitialize(function (params) {
 
     llog(`Parsed steps: ${JSON.stringify(BehatStepsParserInstance.steps)}`, "log");
 
+    updateCompletionItens();
     configureListener();
 
     return {
         capabilities: {
-            textDocumentSync: documents.syncKind
+            textDocumentSync: documents.syncKind,
+            completionProvider: {
+                resolveProvider: true
+            }
         }
     }
 });
@@ -69,6 +75,15 @@ connection.onDidChangeConfiguration((param) => {
     BehatStepsParserInstance.updateStepsCache();
     configureListener();
     configureAutoUpdateListener();
+});
+
+connection.onCompletion((textDocumentPosition, completationInfo) => {
+    return completionItens;
+});
+
+connection.onCompletionResolve((item) => {
+
+    return item;
 });
 
 function validate(document) {
@@ -118,6 +133,21 @@ function configureAutoUpdateListener() {
                 validate(document);
             });
         }
+    });
+}
+
+function updateCompletionItens() {
+    completionItens = BehatStepsParserInstance.steps.map((step) => {
+        var item = VSCodeLangServer.CompletionItem.create(
+            step.regex.step,
+            15 // VSCodeLangServer.CompletionItemKind.Snippet,
+        );
+        item.description = `Defined in ${step.context.className}::${step.context.method}`;
+        item.documentation = "not ready yet";
+        item.insertText = step.regex.snippet;
+        item.step = step;
+
+        return item;
     });
 }
 

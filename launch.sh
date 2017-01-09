@@ -1,5 +1,5 @@
 #!/bin/bash
 
-code ./client
-code ./server
+code-insiders ./client
+code-insiders ./server
 

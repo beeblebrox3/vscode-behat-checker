@@ -59,6 +59,10 @@
             {
                 "command": "behatChecker.reload",
                 "title": "Reload behat checker server"
+            },
+            {
+                "command": "behatChecker.showSteps",
+                "title": "Show available steps"
             }
         ],
         "keybindings": [
@@ -69,6 +73,10 @@
             {
                 "key": "ctrl+alt+l",
                 "command": "behatChecker.reload"
+            },
+            {
+                "key": "ctrl+alt+shift+p",
+                "command": "behatChecker.showSteps"
             }
         ]
     },

@@ -114,12 +114,16 @@ class BehatStepsParser {
             throw new Error("Invalid format");
         }
 
+        let regex = this.makeStepRegex(matches[3]);
+        let snippet = this.makeSnippetFromRegex(regex);
+
         return {
             suite: trim(matches[1]),
             regex: {
                 keyword: trim(matches[2]),
                 originalStep: trim(matches[3]),
-                step: this.makeStepRegex(matches[3])
+                step: regex,
+                snippet: snippet
             }
         };
     }
@@ -180,6 +184,12 @@ class BehatStepsParser {
             let errorMessage = `Invalid regex. Input: ${step} | Output: ${regex}`;
             throw new Error(errorMessage);
         }
+    }
+
+    makeSnippetFromRegex(regex) {
+        let counter = 0;
+        return regex.replace(/\"\??\(\[\^\"\]\*\)\"\??/g, () => `{{ arg${counter++} }}`)
+                    .replace(/^\^|\$$/g, '');
     }
 }
 
