@@ -43,7 +43,8 @@ connection.onInitialize(function (params) {
 
     return {
         capabilities: {
-            textDocumentSync: documents.syncKind
+            textDocumentSync: documents.syncKind,
+            definitionProvider: true
         }
     }
 });
