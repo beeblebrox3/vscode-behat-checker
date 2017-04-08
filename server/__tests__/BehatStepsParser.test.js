@@ -30,7 +30,7 @@ describe("paths and config file", () => {
 
     test("should get correct cmd", () => {
         instance.updateConfig("/app", "b.yml");
-        equals(instance.getCmdListSteps(), "php /app/vendor/bin/behat -c /app/b.yml -di /app/");
+        equals(instance.getCmdListSteps(), "php /app/vendor/bin/behat -c /app/b.yml -di /app");
     });
 });
 
