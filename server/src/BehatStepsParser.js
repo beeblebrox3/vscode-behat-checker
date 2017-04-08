@@ -1,7 +1,6 @@
 const execSync = require('child_process').execSync;
-const DS = "/";
 const trim = require("super-trim");
-
+const path = require("path");
 
 /**
  * Class responsible for intereact with behat CLI and parse the output to detect
@@ -25,9 +24,45 @@ class BehatStepsParser {
      * @memberOf BehatStepsParser
      */
     updateConfig(projectDirectory, configFile) {
-        this.projectDirectory = projectDirectory + DS;
-        this.configFile = this.projectDirectory + configFile;
-        this.behatCMD = `php ${this.projectDirectory}vendor${DS}bin${DS}behat`;
+        this.projectDirectory = path.resolve(projectDirectory);
+        this.configFile = path.resolve(this.projectDirectory, configFile);
+        this.behatCMD = this.getBehatCMD();
+    }
+
+    /**
+     * Get behat cli command
+     *
+     * @returns string
+     *
+     * @memberOf BehatStepsParser
+     */
+    getBehatCMD() {
+        const composerBinDir = this.getComposerBinDir();
+        const cli = path.resolve(this.projectDirectory, composerBinDir, "behat");
+        return `php ${cli}`;
+    }
+
+    /**
+     * Get the composer bin directory
+     *
+     * @returns string
+     *
+     * @memberOf BehatStepsParser
+     */
+    getComposerBinDir() {
+        const composerConfigPath = path.resolve(this.projectDirectory, "composer.json");
+        const defaultPath = "vendor/bin";
+
+        try {
+            const composerConfig = require(composerConfigPath);
+            if (composerConfig.config && composerConfig.config["bin-dir"]) {
+                return composerConfig.config["bin-dir"] || defaultPath;
+            }
+
+            return defaultPath;
+        } catch (ex) {
+            return defaultPath;
+        }
     }
 
     /**
