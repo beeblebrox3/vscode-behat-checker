@@ -7,7 +7,7 @@
         "url": "https://github.com/beeblebrox3/vscode-behat-checker"
     },
     "license": "MIT",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "author": "Luís Henrique Faria <luish.faria@gmail.com>",
     "publisher": "beeblebrox3",
     "engines": {
@@ -78,13 +78,13 @@
     },
     "devDependencies": {
         "@types/mocha": "^2.2.32",
-        "@types/node": "^6.0.40",
+        "@types/node": "^7.0.12",
         "eslint": "^3.6.0",
-        "mocha": "^2.3.3",
+        "mocha": "^3.2.0",
         "typescript": "^2.0.3",
         "vscode": "^1.0.0"
     },
     "dependencies": {
-        "vscode-languageclient": "^2.6.2"
+        "vscode-languageclient": "^3.2.0"
     }
 }
