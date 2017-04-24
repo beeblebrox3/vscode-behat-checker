@@ -50,15 +50,28 @@ class FeatureLinter {
      * @memberOf FeatureLinter
      */
     validateStep(step) {
+        return this.getContext(step) !== false;
+    }
+
+    /**
+     *
+     *
+     * @param {String} step
+     * @returns
+     *
+     * @memberOf FeatureLinter
+     */
+    getContext(step) {
         const steps = this.stepsParser.steps;
         let stepsCount = steps.length;
 
         for (let i = 0; i < stepsCount; i++) {
             let stepRegex = new RegExp(steps[i].regex.step);
             if (stepRegex.exec(step)) {
-                return true;
+                return steps[i];
             }
         }
+
         return false;
     }
 }

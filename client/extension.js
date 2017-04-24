@@ -10,20 +10,13 @@ let debug = extensionUserConfig.get("debug", false);
 // show notification if debug is enabled
 const notify = str => !debug || vscode.window.showInformationMessage(str);
 
-class DefinitionProvider {
-    provideDefinition(document, position, token) {
-        console.log(arguments);
-        return 1;
-    }
-}
-
 exports.activate = context => {
     !debug || vscode.window.showInformationMessage("Behat Checker Activated");
 
     const serverModule = context.asAbsolutePath(path.join('../server', 'index.js'));
-    const debugOptions = { execArgv: ["--nolazy", "--debug=6199"] };
+    const debugOptions = { execArgv: ["--nolazy", "--debug=6004"] };
     const serverOptions = {
-        run : { module: serverModule, transport: vscodelangclient.TransportKind.ipc },
+        run: { module: serverModule, transport: vscodelangclient.TransportKind.ipc, options: debugOptions },
         debug: { module: serverModule, transport: vscodelangclient.TransportKind.ipc, options: debugOptions }
     }
 
@@ -54,18 +47,12 @@ exports.activate = context => {
         });
     });
 
-    let goToDisposable = vscode.languages.registerDefinitionProvider(
-        { language: 'feature', scheme: 'file'},
-        new DefinitionProvider()
-    );
-
     client.start();
 
     context.subscriptions.push(client);
     context.subscriptions.push(updateCacheDisponsable);
     context.subscriptions.push(reloadDisponsable);
-    context.subscriptions.push(goToDisposable);
-} 
+}
 
 exports.deactivate = () => {
 }

@@ -1,28 +1,21 @@
 {
-    "version": "0.1.0",
+    // Use IntelliSense to learn about possible Node.js debug attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
     "configurations": [
         {
-            "name": "Attach",
-            "type": "node",
-            "request": "attach",
-            "port": 6199,
-            "sourceMaps": true,
-            "outDir": "${workspaceRoot}/../client/server"
-        },
-        {
-            "name": "Test",
             "type": "node",
             "request": "launch",
-            "port": 5858,
-            "runtimeArgs": [
-                "--harmony"
-            ],
-            "args": [
-                "${workspaceRoot}/__tests__/FeatureLinter.test.js",
-                "--runInBand"
-            ],
-            "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
-            "cwd": "${workspaceRoot}",
+            "name": "Launch Program",
+            "program": "${file}"
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Attach to Port",
+            "address": "127.0.0.1",
+            "port": 6004
         }
     ]
 }

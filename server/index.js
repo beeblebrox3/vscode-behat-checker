@@ -1,7 +1,9 @@
 const BehatStepsParser = require("./src/BehatStepsParser");
 const FeatureLinter = require("./src/FeatureLinter");
 const VSCodeLangServer = require("vscode-languageserver");
+const ContextsLocator = require("./src/ContextsLocator");
 const path = require("path");
+const strim = require('super-trim');
 
 let connection = VSCodeLangServer.createConnection(
     new VSCodeLangServer.IPCMessageReader(process),
@@ -36,6 +38,8 @@ connection.onInitialize(function (params) {
 
     BehatStepsParserInstance = new BehatStepsParser(workspaceRoot, settings.configFile);
     FeatureLinterInstance = new FeatureLinter(BehatStepsParserInstance);
+    ContextsLocatorInstance = new ContextsLocator(workspaceRoot, settings.configFile);
+    ContextsLocatorInstance.updateMap();
 
     llog(`Parsed steps: ${JSON.stringify(BehatStepsParserInstance.steps)}`, "log");
 
@@ -70,6 +74,30 @@ connection.onDidChangeConfiguration((param) => {
     BehatStepsParserInstance.updateStepsCache();
     configureListener();
     configureAutoUpdateListener();
+});
+
+connection.onDefinition((target) => {
+    let context = strim(
+        documents._documents[target.textDocument.uri].getText().split("\n")[target.position.line]
+    );
+    context = strim(context.split(" ").splice(1).join(" "));
+    const contextFound = FeatureLinterInstance.getContext(context);
+    if (!contextFound) {
+        return false;
+    }
+
+    let response = ContextsLocatorInstance.getFileAndLineNumberByContext(
+        contextFound.context.className,
+        contextFound.context.methodName
+    );
+
+    return VSCodeLangServer.Location.create(
+        "file://" + response.file,
+        VSCodeLangServer.Range.create(
+            VSCodeLangServer.Position.create(response.startLine, 0),
+            VSCodeLangServer.Position.create(response.endLine, Number.MAX_SAFE_INTEGER)
+        )
+    );
 });
 
 function validate(document) {
