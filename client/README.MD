@@ -1,6 +1,6 @@
 # Behat Checker
 
-This is an vscode extension to work with [Behat](http://behat.org). It aims to allow people that doesn't use PHPStorm to have a decent tool to write features ;)
+This is a vscode extension to work with [Behat](http://behat.org). It aims to allow people that doesn't use PHPStorm to have a decent tool to write features ;)
 
 ![demo](https://github.com/beeblebrox3/vscode-behat-checker/raw/master/client/images/vscode-behat-checker.gif "Demonstration")
 
@@ -10,7 +10,7 @@ It depends of `Cucumber (Gherkin) Syntax and Snippets` extension. For now ;)
 
 ## Prerequisites
 The extension requires `Cucumber (Gherkin) Syntax and Snippets` or similar installed.
-Also your project must have behat available under `/vendor/bin/behat`.
+Also your project must have behat available under `/vendor/bin/behat` or [bin-dir composer's config](https://getcomposer.org/doc/articles/vendor-binaries.md) correctly setted.
 
 ## Configuration options
 
@@ -20,4 +20,4 @@ Also your project must have behat available under `/vendor/bin/behat`.
 
 ## Commands
 - `behatChecker.updateCache` - the extension communicate with behat and ask for step definitions. If you change your php code, run this command to update de cache, so the extension will know about your new/updated steps;
-- `behatChecker.reload` - will reload the extension server internal state 
+- `behatChecker.reload` - will reload the extension server internal state.
