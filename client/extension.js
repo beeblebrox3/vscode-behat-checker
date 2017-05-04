@@ -52,7 +52,7 @@ exports.activate = context => {
     context.subscriptions.push(client);
     context.subscriptions.push(updateCacheDisponsable);
     context.subscriptions.push(reloadDisponsable);
-} 
+}
 
 exports.deactivate = () => {
 }

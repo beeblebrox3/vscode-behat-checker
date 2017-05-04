@@ -37,6 +37,8 @@ connection.onInitialize(function (params) {
     BehatStepsParserInstance = new BehatStepsParser(workspaceRoot, settings.configFile);
     FeatureLinterInstance = new FeatureLinter(BehatStepsParserInstance);
 
+    llog(`Detected behat path: ${BehatStepsParserInstance.getBehatCMD()}`, 'debug');
+
     llog(`Parsed steps: ${JSON.stringify(BehatStepsParserInstance.steps)}`, "log");
 
     configureListener();
