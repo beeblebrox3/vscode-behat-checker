@@ -1,11 +1,10 @@
 const BehatStepsParser = require("./src/BehatStepsParser");
 const FeatureLinter = require("./src/FeatureLinter");
 const VSCodeLangServer = require("vscode-languageserver");
-const path = require("path");
 
 let connection = VSCodeLangServer.createConnection(
-    new VSCodeLangServer.IPCMessageReader(process),
-    new VSCodeLangServer.IPCMessageWriter(process)
+  new VSCodeLangServer.IPCMessageReader(process),
+  new VSCodeLangServer.IPCMessageWriter(process)
 );
 
 // @todo make it external
@@ -18,109 +17,123 @@ let workspaceRoot;
 let BehatStepsParserInstance;
 let FeatureLinterInstance;
 let settings = {
-    trigger: "onChange",
-    configFile: "behat.yml",
-    debug: false
+  trigger: "onChange",
+  configFile: "behat.yml",
+  debug: false
 };
 
 let listenerDisposable;
 connection.onInitialize(function (params) {
-    llog("connection initialize", "debug");
+  llog("connection initialize", "debug");
 
-    workspaceRoot = params.rootPath;
-    settings.trigger = params.initializationOptions.trigger || settings.trigger;
-    settings.configFile = params.initializationOptions.configFile || settings.configFile;
+  workspaceRoot = params.rootPath;
+  settings.trigger = params.initializationOptions.trigger || settings.trigger;
+  settings.configFile = params.initializationOptions.configFile || settings.configFile;
+  settings.behatPath = params.initializationOptions.behatPath || null;
 
-    llog(`workspaceRoot: ${workspaceRoot}`, "debug");
-    llog(`seggints: ${JSON.stringify(settings)}`, "debug");
+  llog(`workspaceRoot: ${workspaceRoot}`, "debug");
+  llog(`settings: ${JSON.stringify(settings)}`, "debug");
 
-    BehatStepsParserInstance = new BehatStepsParser(workspaceRoot, settings.configFile);
-    FeatureLinterInstance = new FeatureLinter(BehatStepsParserInstance);
+  BehatStepsParserInstance = new BehatStepsParser(workspaceRoot, settings.configFile, settings.behatPath);
+  FeatureLinterInstance = new FeatureLinter(BehatStepsParserInstance);
 
-    llog(`Detected behat path: ${BehatStepsParserInstance.getBehatCMD()}`, 'debug');
+  llog(`Detected behat path: ${BehatStepsParserInstance.getBehatCMD()}`, 'debug');
 
-    llog(`Parsed steps: ${JSON.stringify(BehatStepsParserInstance.steps)}`, "log");
+  llog(`Parsed steps: ${JSON.stringify(BehatStepsParserInstance.steps)}`, "log");
 
-    configureListener();
+  configureListener();
 
-    return {
-        capabilities: {
-            textDocumentSync: documents.syncKind
-        }
+  return {
+    capabilities: {
+      textDocumentSync: documents.syncKind
     }
+  }
 });
 
-connection.onRequest({method: "behatChecker.updateCache"}, function () {
-    BehatStepsParserInstance.updateStepsCache();
-    connection.sendNotification({method: "behatChecker.cacheUpdated"}, {});
-    llog(`Parsed steps: ${JSON.stringify(BehatStepsParserInstance.steps)}`, "log");
+connection.onRequest({
+  method: "behatChecker.updateCache"
+}, function () {
+  BehatStepsParserInstance.updateStepsCache();
+  connection.sendNotification({
+    method: "behatChecker.cacheUpdated"
+  }, {});
+  llog(`Parsed steps: ${JSON.stringify(BehatStepsParserInstance.steps)}`, "log");
 });
 
-connection.onRequest({method: "behatChecker.reload"}, function () {
-    BehatStepsParserInstance = new BehatStepsParser(workspaceRoot, settings.configFile);
-    FeatureLinterInstance = new FeatureLinter(BehatStepsParserInstance);
-    llog(`Parsed steps: ${JSON.stringify(BehatStepsParserInstance.steps)}`, "log");
+connection.onRequest({
+  method: "behatChecker.reload"
+}, function () {
+  BehatStepsParserInstance = new BehatStepsParser(workspaceRoot, settings.configFile, settings.behatPath);
+  FeatureLinterInstance = new FeatureLinter(BehatStepsParserInstance);
+  llog(`Parsed steps: ${JSON.stringify(BehatStepsParserInstance.steps)}`, "log");
 });
 
 connection.onDidChangeConfiguration((param) => {
-    llog("configuration did changed", "debug");
-    settings.configFile = param.settings.behatChecker.configFile || settings.configFile;
-    settings.trigger = param.settings.behatChecker.trigger || settings.trigger;
-    settings.debug = param.settings.behatChecker.debug || settings.debug;
-    BehatStepsParserInstance.updateConfig(workspaceRoot, settings.configFile);
-    BehatStepsParserInstance.updateStepsCache();
-    configureListener();
-    configureAutoUpdateListener();
+  llog("configuration did changed", "debug");
+  settings.configFile = param.settings.behatChecker.configFile || settings.configFile;
+  settings.trigger = param.settings.behatChecker.trigger || settings.trigger;
+  settings.debug = param.settings.behatChecker.debug || settings.debug;
+  settings.behatPath = param.settings.behatPath || undefined;
+  BehatStepsParserInstance.updateConfig(workspaceRoot, settings.configFile, settings.behatPath);
+  BehatStepsParserInstance.updateStepsCache();
+  configureListener();
+  configureAutoUpdateListener();
 });
 
 function validate(document) {
-    const supportedLanguages = ["feature", "gherkin"];
-    if (supportedLanguages.indexOf(document.languageId) === -1) {
-        return;
-    }
+  const supportedLanguages = ["feature", "gherkin"];
+  if (supportedLanguages.indexOf(document.languageId) === -1) {
+    return;
+  }
 
-    let invalidLines = FeatureLinterInstance.lint(document.getText());
-    llog(`invalid lines: ${invalidLines.join(",")}`, "debug");
+  let invalidLines = FeatureLinterInstance.lint(document.getText());
+  llog(`invalid lines: ${invalidLines.join(",")}`, "debug");
 
-    let diagnostics = invalidLines.map(function (line) {
-        return {
-            severity: 1,
-            range: {
-                start: { line: line - 1, character: 1},
-                end: { line: line - 1, character: Number.MAX_VALUE }
-            },
-            message: `This step is undefined (line ${line})`,
+  let diagnostics = invalidLines.map(function (line) {
+    return {
+      severity: 1,
+      range: {
+        start: {
+          line: line - 1,
+          character: 1
+        },
+        end: {
+          line: line - 1,
+          character: Number.MAX_VALUE
         }
-    });
+      },
+      message: `This step is undefined (line ${line})`,
+    }
+  });
 
-    connection.sendDiagnostics({
-        uri: document.uri,
-        diagnostics: diagnostics
-    });
+  connection.sendDiagnostics({
+    uri: document.uri,
+    diagnostics: diagnostics
+  });
 }
 
 function configureListener() {
-    if (listenerDisposable && listenerDisposable.dispose) {
-        listenerDisposable.dispose();
-    }
+  if (listenerDisposable && listenerDisposable.dispose) {
+    listenerDisposable.dispose();
+  }
 
-    let eventName = settings.trigger === "onChange" ? "onDidChangeContent" : "onDidSave";
-    listenerDisposable = documents[eventName]((change) => validate(change.document));
-    llog(`listen event ${eventName}`, "debug");
+  let eventName = settings.trigger === "onChange" ? "onDidChangeContent" : "onDidSave";
+  listenerDisposable = documents[eventName]((change) => validate(change.document));
+  llog(`listen event ${eventName}`, "debug");
 }
 
 function configureAutoUpdateListener() {
-    let disposable = documents.onDidSave((change) => {
-        if (change.document.languageId === "php") {
-            BehatStepsParserInstance.updateStepsCache();
-            llog("PHP file saved, cache updated", "info");
+  let disposable = documents.onDidSave((change) => {
+    if (change.document.languageId === "php") {
+      BehatStepsParserInstance.updateStepsCache();
+      llog("PHP file saved, cache updated", "info");
 
-            documents.all().map((document) => {
-                llog(`Validating document ${document.uri}`);
-                validate(document);
-            });
-        }
-    });
+      documents.all().map((document) => {
+        llog(`Validating document ${document.uri}`);
+        validate(document);
+      });
+    }
+  });
 }
 
 connection.listen();

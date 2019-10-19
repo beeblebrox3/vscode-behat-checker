@@ -11,48 +11,77 @@ let debug = extensionUserConfig.get("debug", false);
 const notify = str => !debug || vscode.window.showInformationMessage(str);
 
 exports.activate = context => {
-    !debug || vscode.window.showInformationMessage("Behat Checker Activated");
+  notify("Behat Checker Activated");
 
-    const serverModule = context.asAbsolutePath(path.join('server', 'index.js'));
-    const debugOptions = { execArgv: ["--nolazy", "--debug=6199"] };
-    const serverOptions = {
-        run : { module: serverModule, transport: vscodelangclient.TransportKind.ipc },
-        debug: { module: serverModule, transport: vscodelangclient.TransportKind.ipc, options: debugOptions }
+  const serverModule = context.asAbsolutePath(
+    path.join('server', 'index.js')
+  );
+
+  const debugOptions = {
+    execArgv: ["--nolazy", "--inspect=6009"]
+  };
+  const serverOptions = {
+    run: {
+      module: serverModule,
+      transport: vscodelangclient.TransportKind.ipc
+    },
+    debug: {
+      module: serverModule,
+      transport: vscodelangclient.TransportKind.ipc,
+      options: debugOptions
     }
+  }
 
-    const clientOptions = {
-        documentSelector: ["feature", "php"],
-        synchronize: {
-            configurationSection: "behatChecker",
-            fileEvents: vscode.workspace.createFileSystemWatcher('**/.clientrc')
-        },
-        initializationOptions: {
-            configFile: extensionUserConfig.get("configFile"),
-            trigger: extensionUserConfig.get("trigger"),
-            debug: extensionUserConfig.get("debug")
-        }
+  const clientOptions = {
+    documentSelector: ["feature", "php"],
+    synchronize: {
+      configurationSection: "behatChecker",
+      fileEvents: vscode.workspace.createFileSystemWatcher('**/.clientrc')
+    },
+    initializationOptions: {
+      configFile: extensionUserConfig.get("configFile"),
+      trigger: extensionUserConfig.get("trigger"),
+      debug: extensionUserConfig.get("debug"),
+      behatPath: extensionUserConfig.get("behatPath"),
     }
+  }
 
-    let client = new vscodelangclient.LanguageClient("Behat Checker", serverOptions, clientOptions);
-    let updateCacheDisponsable = vscode.commands.registerCommand("behatChecker.updateCache", () => {
-        notify("requesting steps cache update");
-        client.sendRequest({method: "behatChecker.updateCache"}).then(() => {
-            vscode.window.showInformationMessage("Steps cache updated!");
-        });
+  let client = null;
+  try {
+    client = new vscodelangclient.LanguageClient("Behat Checker", serverOptions, clientOptions);
+  } catch (e) {
+    vscode.window.showErrorMessage("Failed to create client");
+    console.log(e);
+    return
+  }
+
+
+  let updateCacheDisponsable = vscode.commands.registerCommand("behatChecker.updateCache", () => {
+    notify("requesting steps cache update");
+    client.sendRequest({
+      method: "behatChecker.updateCache"
+    }).then(() => {
+      vscode.window.showInformationMessage("Steps cache updated!");
     });
+  });
 
-    let reloadDisponsable = vscode.commands.registerCommand("behatChecker.reload", () => {
-        client.sendRequest({method: "behatChecker.reload"}, {}).then(() =>{
-            notify("Reloaded!");
-        });
-    });
+  let reloadDisponsable = vscode.commands.registerCommand("behatChecker.reload", async () => {
+    try {
+      await sendRequest({
+        method: "behatChecker.reload"
+      }, {});
+      notify("Reloaded!");
+    } catch (e) {
+      notify(`Failed!\n ${e.message}`);
+      console.log(e);
+    }
+  });
 
-    client.start();
+  client.start();
 
-    context.subscriptions.push(client);
-    context.subscriptions.push(updateCacheDisponsable);
-    context.subscriptions.push(reloadDisponsable);
+  context.subscriptions.push(client);
+  context.subscriptions.push(updateCacheDisponsable);
+  context.subscriptions.push(reloadDisponsable);
 }
 
-exports.deactivate = () => {
-}
+exports.deactivate = () => {}

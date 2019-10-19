@@ -1,0 +1,10 @@
+**/__tests__
+**/__mocks__
+**/coverage-report
+**/.idea
+**/*.vsix
+.vscode-test/**
+**/test
+**/.vscode
+assets/
+*.sh

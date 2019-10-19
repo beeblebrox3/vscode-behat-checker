@@ -1,90 +1,25 @@
 {
-    "name": "behat-checker",
-    "displayName": "Behat Checker",
-    "description": "Extension to help you identify undefined steps on feature files (for behat)",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/beeblebrox3/vscode-behat-checker"
-    },
-    "license": "MIT",
-    "version": "1.0.6",
-    "author": "Luís Henrique Faria <luish.faria@gmail.com>",
-    "publisher": "beeblebrox3",
-    "engines": {
-        "vscode": "^1.5.0"
-    },
-    "categories": [
-        "Linters",
-        "Other"
-    ],
-    "keywords": [
-        "behat",
-        "php",
-        "gherkin",
-        "cucumber"
-    ],
-    "preview": true,
-    "activationEvents": [
-        "onLanguage:feature",
-        "onLanguage:gherkin"
-    ],
-    "main": "./extension",
-    "contributes": {
-        "configuration": {
-            "type": "object",
-            "title": "Behat Checker Configuration",
-            "properties": {
-                "behatChecker.configFile": {
-                    "type": "string",
-                    "default": "config/behat.yml",
-                    "description": "path to behat config file"
-                },
-                "behatChecker.trigger": {
-                    "type": "string",
-                    "default": "onChange",
-                    "description": "When to lint the file (onChange or onSave)"
-                },
-                "behatChecker.debug": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Turn this setting on to show debug information"
-                }
-            }
-        },
-        "commands": [
-            {
-                "command": "behatChecker.updateCache",
-                "title": "Update steps cache"
-            },
-            {
-                "command": "behatChecker.reload",
-                "title": "Reload behat checker server"
-            }
-        ],
-        "keybindings": [
-            {
-                "key": "ctrl+alt+p",
-                "command": "behatChecker.updateCache"
-            },
-            {
-                "key": "ctrl+alt+l",
-                "command": "behatChecker.reload"
-            }
-        ]
-    },
-    "scripts": {
-        "vscode:prepublish": "./prepublish.sh",
-        "postinstall": "node ./node_modules/vscode/bin/install"
-    },
-    "devDependencies": {
-        "@types/mocha": "^2.2.32",
-        "@types/node": "^7.0.12",
-        "eslint": "^3.6.0",
-        "mocha": "^3.2.0",
-        "typescript": "^2.0.3",
-        "vscode": "^1.0.0"
-    },
-    "dependencies": {
-        "vscode-languageclient": "^3.2.0"
-    }
+  "name": "behat-checker-client",
+  "displayName": "Behat Checker Client",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/beeblebrox3/vscode-behat-checker"
+  },
+  "license": "MIT",
+  "author": "Luís Henrique Faria <luish.faria@gmail.com>",
+  "publisher": "beeblebrox3",
+  "engines": {
+    "vscode": "^1.5.0"
+  },
+  "devDependencies": {
+    "@types/mocha": "^2.2.32",
+    "@types/node": "^7.0.12",
+    "eslint": "^3.6.0",
+    "mocha": "^3.2.0",
+    "typescript": "^2.0.3",
+    "vscode": "^1.0.0"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^3.2.0"
+  }
 }

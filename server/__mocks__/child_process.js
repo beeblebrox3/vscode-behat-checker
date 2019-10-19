@@ -5,15 +5,15 @@ const real_child_process = require.requireActual("child_process");
 
 let steps = "";
 child_process.__setMockSteps = (output) => {
-    steps = output;
+  steps = output;
 }
 
 child_process.execSync = (cmd, options) => {
-    if (new RegExp("behat", "i").exec(cmd)) {
-        return steps;
-    }
+  if (new RegExp("behat", "i").exec(cmd)) {
+    return steps;
+  }
 
-    return real_child_process.execSync.apply(null, args);
+  return real_child_process.execSync.apply(null, args);
 }
 
 module.exports = child_process;
