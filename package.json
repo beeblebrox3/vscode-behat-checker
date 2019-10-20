@@ -78,9 +78,10 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "bash prepublish.sh",
+    "vscode:prepublish": "webpack --mode production",
     "postinstall": "node ./client/node_modules/vscode/bin/install",
-    "dev": "webpack --mode development --watch"
+    "dev": "webpack --mode development --watch",
+    "webpack": "webpack --mode development"
   },
   "devDependencies": {
     "ts-loader": "^6.2.0",

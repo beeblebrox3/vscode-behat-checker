@@ -1,3 +1,5 @@
+/// <reference path="typings.d.ts"/>
+
 import { execSync } from 'child_process';
 import { resolve, isAbsolute } from 'path';
 

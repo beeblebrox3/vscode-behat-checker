@@ -13,6 +13,7 @@
     "ter-arrow-parens": false,
     "object-shorthand-properties-first": false,
     "import-name": false,
+    "no-reference": false,
     "ban-types": {
       "options": ["String"],
       "severity": "warn"
