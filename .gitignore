@@ -3,3 +3,4 @@
 **/*.log
 **/coverage-report
 **/out
+dist/
