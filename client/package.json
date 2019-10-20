@@ -16,10 +16,15 @@
     "@types/node": "^7.0.12",
     "eslint": "^3.6.0",
     "mocha": "^3.2.0",
-    "typescript": "^2.0.3",
-    "vscode": "^1.0.0"
+    "vscode": "^1.0.0",
+    "tslint": "^5.20.0",
+    "typescript": "^3.6.4",
+    "@types/jest": "^24.0.19",
+    "@types/cucumber": "^4.0.7",
+    "tslint-config-airbnb": "^5.11.2",
+    "tslint-eslint-rules": "^5.4.0"
   },
   "dependencies": {
-    "vscode-languageclient": "^3.2.0"
+    "vscode-languageclient": "^5.2.1"
   }
 }
