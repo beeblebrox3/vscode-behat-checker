@@ -1,5 +1,13 @@
 language: node_js
 
 install: skip
+
 script:
   - make test
+  - sonar-scanner
+
+addons:
+  sonarcloud:
+    organization: "beeblebrox3-github"
+    token:
+      secure: $SONAR_TOKEN
