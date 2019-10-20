@@ -1,4 +1,9 @@
+dist: bionic
+
 language: node_js
+node_js:
+  - "10"
+  - "12"
 
 install: skip
 
@@ -11,3 +16,10 @@ addons:
     organization: "beeblebrox3-github"
     token:
       secure: $SONAR_TOKEN
+
+cache:
+  directories:
+  - node_modules
+  - client/node_modules
+  - server/node_modules
+  - '$HOME/.sonar/cache'
