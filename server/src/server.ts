@@ -3,14 +3,17 @@ import {
   TextDocuments,
   TextDocument,
   Diagnostic,
-  ProposedFeatures,
   TextDocumentChangeEvent,
-  Disposable
+  Disposable,
+  Location,
+  Range,
+  Position
 } from 'vscode-languageserver';
 
 import { BehatStepsParser } from './BehatStepsParser';
 import { FeatureLinter } from './FeatureLinter';
 import { llog, ServerSettings, updateSettings } from './util';
+import strim from 'super-trim';
 
 const connection = createConnection();
 
@@ -53,7 +56,8 @@ connection.onInitialize(params => {
 
   return {
     capabilities: {
-      textDocumentSync: documents.syncKind
+      textDocumentSync: documents.syncKind,
+      definitionProvider: BehatStepsParserInstance.behatCanProvideGoToDefinition(),
     }
   };
 });
@@ -68,6 +72,7 @@ connection.onRequest('behatChecker.updateCache', () => {
 connection.onRequest('behatChecker.reload', () => {
   BehatStepsParserInstance = new BehatStepsParser(workspaceRoot, settings.configFile, settings.behatPath);
   FeatureLinterInstance = new FeatureLinter(BehatStepsParserInstance);
+
   llog(`Parsed steps: ${JSON.stringify(BehatStepsParserInstance.getSteps())}`, 'log');
 });
 
@@ -80,6 +85,28 @@ connection.onDidChangeConfiguration((param) => {
   configureAutoUpdateListener();
 });
 
+connection.onDefinition(target => {
+  if (!target) return null;
+  const document = documents.get(target.textDocument.uri);
+
+  if (!document) return null;
+
+  let context = strim(document.getText().split("\n")[target.position.line]);
+  context = strim(context.split(' ').splice(1).join(' '));
+
+  const contextFound = FeatureLinterInstance.getContext(context);
+  if (!contextFound) return null;
+  if (!contextFound.context.lines) return null;
+
+  return Location.create(
+    `file://${contextFound.context.filePath}`,
+    Range.create(
+      Position.create(contextFound.context.lines.start, 0),
+      Position.create(contextFound.context.lines.end, Number.MAX_SAFE_INTEGER)
+    )
+  );
+});
+
 function validate(document: TextDocument) {
   const supportedLanguages = ['feature', 'gherkin'];
   if (supportedLanguages.indexOf(document.languageId) === -1) {
@@ -89,22 +116,20 @@ function validate(document: TextDocument) {
   const invalidLines = FeatureLinterInstance.lint(document.getText());
   llog(`invalid lines: ${invalidLines.join(',')}`, 'debug');
 
-  const diagnostics: Diagnostic[] = invalidLines.map(function (line) {
-    return {
-      severity: 1,
-      range: {
-        start: {
-          line: line - 1,
-          character: 1
-        },
-        end: {
-          line: line - 1,
-          character: Number.MAX_VALUE
-        }
+  const diagnostics: Diagnostic[] = invalidLines.map(line => ({
+    severity: 1,
+    range: {
+      start: {
+        line: line - 1,
+        character: 1
       },
-      message: `This step is undefined (line ${line})`,
-    };
-  });
+      end: {
+        line: line - 1,
+        character: Number.MAX_VALUE
+      }
+    },
+    message: `This step is undefined (line ${line})`,
+  }));
 
   connection.sendDiagnostics({
     uri: document.uri,
@@ -126,12 +151,12 @@ function configureListener() {
 }
 
 function configureAutoUpdateListener() {
-  const disposable = documents.onDidSave((change) => {
+  documents.onDidSave((change) => {
     if (change.document.languageId === 'php') {
       BehatStepsParserInstance.updateStepsCache();
       llog('PHP file saved, cache updated', 'info');
 
-      documents.all().map((document) => {
+      documents.all().forEach((document) => {
         llog(`Validating document ${document.uri}`);
         validate(document);
       });

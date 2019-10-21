@@ -36,3 +36,7 @@ default   | [Then|*] /^I do something with different (options|choices)$/
 
 default   | [Then|*] /^I do something with an ugly argument "(?<theuglyargument>.*)"$/
           | at `FeatureContext::someMethod()`
+
+default   | [Then|*] /^I do something with an ugly argument "(?<theuglyargument>.*)"$/
+          | at `FeatureContext::someMethod()`
+          | on `/app/featurephp[10:20]`

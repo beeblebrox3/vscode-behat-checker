@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "gherkin": "^8.1.1",
+    "semver": "^6.3.0",
     "super-trim": "^1.0.0",
     "vscode-languageserver": "^5.2.1"
   },
@@ -20,14 +21,15 @@
     "compile": "tsc"
   },
   "devDependencies": {
-    "jest": "^24.9.0",
-    "tslint": "^5.20.0",
-    "typescript": "^3.6.4",
-    "ts-jest": "^24.1.0",
-    "@types/node": "^12.11.1",
-    "@types/jest": "^24.0.19",
     "@types/cucumber": "^4.0.7",
+    "@types/jest": "^24.0.19",
+    "@types/node": "^12.11.1",
+    "@types/semver": "^6.0.2",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.1.0",
+    "tslint": "^5.20.0",
     "tslint-config-airbnb": "^5.11.2",
-    "tslint-eslint-rules": "^5.4.0"
+    "tslint-eslint-rules": "^5.4.0",
+    "typescript": "^3.6.4"
   }
 }

@@ -1,7 +1,7 @@
-import fs from 'fs';
 jest.mock('child_process');
 
 import { BehatStepsParser } from '../src/BehatStepsParser';
+import { readFileSync } from 'fs';
 
 const project_path = '/project';
 const config_file = 'behat.yml';
@@ -27,7 +27,7 @@ describe('paths and config file', () => {
 
   test('should get correct cmd', () => {
     instance.updateConfig('/app', 'b.yml', 'vendor/bin/behat');
-    expect(instance.getCmdListSteps()).toBe('php /app/vendor/bin/behat -c /app/b.yml -di /app');
+    expect(instance.getCmdListSteps()).toBe('php /app/vendor/bin/behat -c /app/b.yml -di --verbose /app');
   });
 });
 
@@ -56,30 +56,65 @@ describe('make regex', () => {
 
 describe('extract context', () => {
   test('should extract the class and method', () => {
-    expect(instance.extractContext('   | at `Class::method()`')).toMatchObject({
-      className: 'Class',
-      methodName: 'method'
+    const stepDetails = [
+      'default   | [When|*] I do something simple',
+      '| at `FeatureContext::someMethod()`'
+    ];
+
+    expect(instance.extractContext(stepDetails)).toMatchObject({
+      className: 'FeatureContext',
+      methodName: 'someMethod',
     });
   });
 
   test('should extract the class and method with namespace', () => {
-    expect(instance.extractContext('   | at `App\Class::method()`')).toMatchObject({
-      className: 'App\Class',
-      methodName: 'method'
+    const stepDetails = [
+      'default   | [When|*] I do something simple',
+      '| at `App\FeatureContext::someMethod()`'
+    ];
+
+    expect(instance.extractContext(stepDetails)).toMatchObject({
+      className: 'App\FeatureContext',
+      methodName: 'someMethod',
     });
   });
 
   test('should extract the class and method with underline', () => {
-    expect(instance.extractContext('   | at `Class_xpto::method_foo()`')).toMatchObject({
-      className: 'Class_xpto',
-      methodName: 'method_foo'
+    const stepDetails = [
+      'default   | [When|*] I do something simple',
+      '| at `Feature_Context::some_method()`'
+    ];
+
+    expect(instance.extractContext(stepDetails)).toMatchObject({
+      className: 'Feature_Context',
+      methodName: 'some_method',
     });
   });
 
   test('should extract class and method with accents', () => {
-    expect(instance.extractContext('   | at `Cláss::méthodã()`')).toMatchObject({
+    const stepDetails = [
+      'default   | [When|*] I do something simple',
+      '| at `Cláss::méthodã()`'
+    ];
+
+    expect(instance.extractContext(stepDetails)).toMatchObject({
       className: 'Cláss',
-      methodName: 'méthodã'
+      methodName: 'méthodã',
+    });
+  });
+
+  test('should extract class, method, file and line', () => {
+    const stepDetails = [
+      'default   | [When|*] I do something simple',
+      '| at `Feature_Context::some_method()`',
+      '| on `/app/featurephp[10:20]`'
+    ];
+
+    expect(instance.extractContext(stepDetails)).toMatchObject({
+      className: 'Feature_Context',
+      methodName: 'some_method',
+      filePath: '/app/featurephp',
+      lines: { start: 10, end: 20 },
     });
   });
 });
@@ -109,19 +144,19 @@ describe('parse step', () => {
 });
 
 test('update cache', () => {
-  let test_steps = fs.readFileSync(__dirname + '/test_steps.txt').toString();
+  let test_steps = readFileSync(__dirname + '/test_steps.txt').toString();
   require('child_process').__setMockSteps(test_steps);
 
   const localInstance = new BehatStepsParser(project_path, config_file);
 
   // the 9th is invalid
-  expect(localInstance.getSteps().length).toBe(12);
+  expect(localInstance.getSteps().length).toBe(13);
 
   // fix the problem
   test_steps = test_steps.replace(/\(yopa/, '');
   require('child_process').__setMockSteps(test_steps);
   localInstance.updateStepsCache();
-  expect(localInstance.getSteps().length).toBe(13);
+  expect(localInstance.getSteps().length).toBe(14);
 
   require('child_process').__setMockSteps('');
   localInstance.updateStepsCache();
