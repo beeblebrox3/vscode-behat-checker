@@ -1,0 +1,22 @@
+dist: bionic
+
+language: node_js
+node_js:
+  - "10"
+  - "12"
+
+install:
+  - cd server && npm ci && cd ../
+
+script:
+  - cd server && npm run test && cd ../
+
+after_success:
+  - sonar-scanner
+
+addons:
+  sonarcloud:
+    organization: "beeblebrox3-github"
+    token:
+      secure: $SONAR_TOKEN
+

@@ -1,5 +1,6 @@
 **/node_modules
 **/.idea
 **/*.log
-client/server
-server/coverage-report
+**/coverage-report
+**/out
+dist/

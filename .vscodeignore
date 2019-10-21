@@ -1,0 +1,6 @@
+.idea/
+.vscode/
+server/
+client/
+*.vsix
+*.sh
