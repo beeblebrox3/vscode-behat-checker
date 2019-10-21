@@ -7,7 +7,7 @@
     "url": "https://github.com/beeblebrox3/vscode-behat-checker"
   },
   "license": "MIT",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "author": "Luís Henrique Faria <luish.faria@gmail.com>",
   "publisher": "beeblebrox3",
   "engines": {
