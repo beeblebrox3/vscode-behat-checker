@@ -15,6 +15,9 @@ install-deps: client/node_modules server/node_modules node_modules
 clear-deps:
 	rm -Rf client/node_modules server/node_modules node_modules
 
+clear: clear-deps
+	rm -Rf dist
+
 dev: install-deps
 	npm run dev
 

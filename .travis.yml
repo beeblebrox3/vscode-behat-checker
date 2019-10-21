@@ -5,10 +5,13 @@ node_js:
   - "10"
   - "12"
 
-install: skip
+install:
+  - cd server && npm ci && cd ../
 
 script:
-  - make test
+  - cd server && npm run test && cd ../
+
+after_success:
   - sonar-scanner
 
 addons:
@@ -17,9 +20,3 @@ addons:
     token:
       secure: $SONAR_TOKEN
 
-cache:
-  directories:
-  - node_modules
-  - client/node_modules
-  - server/node_modules
-  - '$HOME/.sonar/cache'
