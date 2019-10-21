@@ -2,6 +2,7 @@
 
 import { execSync } from 'child_process';
 import { resolve, isAbsolute } from 'path';
+import { gte } from 'semver';
 
 import trim from 'super-trim';
 
@@ -80,6 +81,16 @@ export class BehatStepsParser {
   public updateStepsCache() {
     const out = execSync(this.getCmdListSteps()).toString();
     this.steps = this.parseSteps(out);
+  }
+
+  public behatCanProvideGoToDefinition() {
+    const cli = `${this.behatCMD} --version`;
+    const out = execSync(cli).toString();
+    const regexp = /(\d+\.\d+\.\d+)/;
+    const matches = regexp.exec(out);
+
+    if (!matches) return false;
+    return gte('3.4.0', matches[0]);
   }
 
   /**

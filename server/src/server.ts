@@ -57,7 +57,7 @@ connection.onInitialize(params => {
   return {
     capabilities: {
       textDocumentSync: documents.syncKind,
-      definitionProvider: true,
+      definitionProvider: BehatStepsParserInstance.behatCanProvideGoToDefinition(),
     }
   };
 });

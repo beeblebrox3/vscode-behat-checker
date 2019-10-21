@@ -12,6 +12,7 @@
     "dot-prop": "^5.1.0",
     "gherkin": "^8.1.1",
     "js-yaml": "^3.13.1",
+    "semver": "^6.3.0",
     "super-trim": "^1.0.0",
     "vscode-languageserver": "^5.2.1"
   },
