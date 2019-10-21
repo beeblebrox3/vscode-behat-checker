@@ -90,7 +90,7 @@ export class BehatStepsParser {
     const matches = regexp.exec(out);
 
     if (!matches) return false;
-    return gte('3.4.0', matches[0]);
+    return gte(matches[0], '3.4.0');
   }
 
   /**
