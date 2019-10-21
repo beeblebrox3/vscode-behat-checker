@@ -11,6 +11,11 @@ export function updateSettings(defaultSettings: ServerSettings, newSettings: Ser
   };
 }
 
+export function asArray<T>(arg: T | T[]): T[] {
+  if (Array.isArray(arg)) return arg;
+  return [arg];
+}
+
 export interface ServerSettings {
   trigger: string;
   configFile: string;

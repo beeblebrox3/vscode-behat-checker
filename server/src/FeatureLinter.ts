@@ -25,8 +25,8 @@ export class FeatureLinter {
       const ast = parser.parse(feature) as ASTFeature;
 
       /* tslint:disable */
-      ast.feature.children.map(scenario => {
-        scenario.scenario.steps.map(step => {
+      ast.feature.children.forEach(scenario => {
+        scenario.scenario.steps.forEach(step => {
           if (!this.validateStep(step.text)) {
             invalidSteps.push(step.location.line);
           }
@@ -53,6 +53,20 @@ export class FeatureLinter {
         return true;
       }
     }
+    return false;
+  }
+
+  public getContext(step: string) {
+    const steps = this.stepsParser.getSteps();
+    const stepsCount = steps.length;
+
+    for (let i = 0; i < stepsCount; i++) {
+      const stepRegex = new RegExp(steps[i].regex.step);
+      if (stepRegex.exec(step)) {
+        return steps[i];
+      }
+    }
+
     return false;
   }
 }

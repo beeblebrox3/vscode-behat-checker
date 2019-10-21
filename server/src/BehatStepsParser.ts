@@ -86,7 +86,7 @@ export class BehatStepsParser {
    * Returns the command to get steps from behat
    */
   public getCmdListSteps(): string {
-    return `${this.behatCMD} -c ${this.configFile} -di ${this.projectDirectory}`;
+    return `${this.behatCMD} -c ${this.configFile} -di --verbose ${this.projectDirectory}`;
   }
 
   /**
@@ -124,18 +124,25 @@ export class BehatStepsParser {
    * Extract the class and method where the step is implemented
    * (last line from step)
    */
-  public extractContext(str: string): Context {
-    const regexContextFinder = /at \`([a-zA-ZÀ-úÀ-ÿ-_\\]+)::([a-zA-ZÀ-úÀ-ÿ-_]+)\(\)/;
-    const matches = regexContextFinder.exec(str);
-    if (!matches || matches.length < 3) {
-      // if the method name has accents may don't match
+  public extractContext(str: string[]): Context {
+    let resp: Partial<Context> = {};
+
+    str.forEach(row => {
+      const extractedClass = this.tryToGetContextClassAndMethodFromStepLine(row);
+      const extractedFile = this.tryToGetContextFileAndLineFromStepLine(row);
+
+      resp = {
+        ...resp,
+        ...(extractedClass || {}),
+        ...(extractedFile || {}),
+      };
+    });
+
+    if (!resp.className) {
       throw new Error(`Invalid context format: ${str}`);
     }
 
-    return {
-      className: matches[1],
-      methodName: matches[2]
-    };
+    return resp as Context;
   }
 
   /**
@@ -170,7 +177,7 @@ export class BehatStepsParser {
     const lines: string[] = step.split('\n');
 
     const suiteAndRegex = this.extractSuiteAndRegex(lines[0]);
-    const context = this.extractContext(lines.pop() as string);
+    const context = this.extractContext(lines);
 
     return {
       suite: suiteAndRegex.suite,
@@ -198,6 +205,36 @@ export class BehatStepsParser {
   public treatAssetPath(projectDir: string, assetPath: string) {
     return isAbsolute(assetPath) ? resolve(assetPath) : resolve(projectDir, assetPath);
   }
+
+  private tryToGetContextClassAndMethodFromStepLine(lineContent: string): Partial<Context> | null {
+    const regexp = /at \`([a-zA-ZÀ-úÀ-ÿ-_\\]+)::([a-zA-ZÀ-úÀ-ÿ-_]+)\(\)/;
+    const matches = regexp.exec(lineContent);
+    if (!matches || matches.length < 3) {
+      // if the method name has accents may don't match
+      // throw new Error(`Invalid context format: ${lineContent}`);
+      return null;
+    }
+
+    return { className: matches[1], methodName: matches[2] };
+  }
+
+  private tryToGetContextFileAndLineFromStepLine(lineContent: string): Partial<Context> | null {
+    const regexp = /on \`([a-zA-ZÀ-úÀ-ÿ-_\\\/\.\d]+)\[(\d+)\:(\d+)\]/;
+    const matches = regexp.exec(lineContent);
+    if (!matches || matches.length < 4) {
+      // if the method name has accents may don't match
+      // throw new Error(`Invalid context format: ${lineContent}`);
+      return null;
+    }
+
+    return {
+      filePath: matches[1],
+      lines: {
+        start: +matches[2],
+        end: +matches[3],
+      }
+    };
+  }
 }
 
 interface ParsedStep {
@@ -209,6 +246,11 @@ interface ParsedStep {
 interface Context {
   className: string;
   methodName: string;
+  filePath?: string;
+  lines?: {
+    start: number;
+    end: number;
+  };
 }
 
 interface SuiteFromStep {

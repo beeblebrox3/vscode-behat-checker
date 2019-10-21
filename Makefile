@@ -24,5 +24,8 @@ dev: install-deps
 test: install-deps
 	cd server && npm run test
 
+test-watch: install-deps
+	cd server && npm run test-watch
+
 package: install-deps
 	vsce package
