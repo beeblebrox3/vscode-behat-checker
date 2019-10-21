@@ -1,5 +1,7 @@
 # Behat Checker
 
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=beeblebrox3_vscode-behat-checker&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=beeblebrox3_vscode-behat-checker)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=beeblebrox3_vscode-behat-checker&metric=coverage)](https://sonarcloud.io/dashboard?id=beeblebrox3_vscode-behat-checker)
 
 This is a vscode extension to work with [Behat](http://behat.org). It aims to allow people that doesn't use PHPStorm to have a decent tool to write features ;)
 
@@ -20,7 +22,7 @@ We detect implementantion using behat CLI (something like `behat -di`).
 
 When using behat >= 3.4.0 this extension can provide "go to definiton" feature (as it depends of a change on the CLI available only after that version).
 
-![demo](https://github.com/beeblebrox3/vscode-behat-checker/raw/feature/goto-definition2/assets/code-goto-definition.gif "Demonstration Goto Definition")
+![demo](https://github.com/beeblebrox3/vscode-behat-checker/raw/feature/master/assets/code-goto-definition.gif "Demonstration Goto Definition")
 
 
 
