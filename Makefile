@@ -24,6 +24,9 @@ dev: install-deps
 test: install-deps
 	cd server && npm run test
 
+test-coverage: install-deps
+	cd server && npm run test-coverage
+
 test-watch: install-deps
 	cd server && npm run test-watch
 

@@ -16,6 +16,7 @@
   },
   "scripts": {
     "test": "jest",
+    "test-coverage": "jest --collect-coverage",
     "test-watch": "jest --watch",
     "dev-watch": "tsc --watch",
     "compile": "tsc"
