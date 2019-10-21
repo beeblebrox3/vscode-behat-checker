@@ -5,6 +5,7 @@ import { resolve, isAbsolute } from 'path';
 import { gte } from 'semver';
 
 import trim from 'super-trim';
+import { llog } from './util';
 
 /**
  * Class responsible for interact with behat CLI and parse the output to detect
@@ -85,12 +86,22 @@ export class BehatStepsParser {
 
   public behatCanProvideGoToDefinition() {
     const cli = `${this.behatCMD} --version`;
+    llog(`CLI check version: ${cli}`, 'debug');
+
     const out = execSync(cli).toString();
+    llog(`Detected version: ${out}`, 'debug');
+
     const regexp = /(\d+\.\d+\.\d+)/;
     const matches = regexp.exec(out);
 
-    if (!matches) return false;
-    return gte(matches[0], '3.4.0');
+    if (!matches) {
+      llog('Failed to parse version', 'debug');
+      return false;
+    }
+
+    const compatibleVersion = gte(matches[0], '3.4.0');
+    llog(`Version ${matches[0]} >= 3.4.0? ${compatibleVersion ? 'yes' : 'no'}`, 'debug');
+    return compatibleVersion;
   }
 
   /**
