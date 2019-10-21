@@ -9,7 +9,7 @@ install:
   - cd server && npm ci && cd ../
 
 script:
-  - cd server && npm run test && cd ../
+  - cd server && npm run test-coverage && cd ../
 
 after_success:
   - sonar-scanner
