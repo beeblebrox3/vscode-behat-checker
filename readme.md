@@ -22,7 +22,7 @@ We detect implementantion using behat CLI (something like `behat -di`).
 
 When using behat >= 3.4.0 this extension can provide "go to definiton" feature (as it depends of a change on the CLI available only after that version).
 
-![demo](https://github.com/beeblebrox3/vscode-behat-checker/raw/feature/master/assets/code-goto-definition.gif "Demonstration Goto Definition")
+![demo](https://raw.githubusercontent.com/beeblebrox3/vscode-behat-checker/master/assets/code-goto-definition.gif "Demonstration Goto Definition")
 
 
 
