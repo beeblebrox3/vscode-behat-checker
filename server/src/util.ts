@@ -1,5 +1,5 @@
-export function llog(message: string, type = 'info') {
-  console.log(`[${type}] ${message}`);
+export function llog(message: string, type = 'info', error: any = null) {
+  console.log(`[${type}] ${message}`, error);
 }
 
 export function updateSettings(defaultSettings: ServerSettings, newSettings: ServerSettings) {

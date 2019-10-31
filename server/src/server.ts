@@ -14,6 +14,7 @@ import { BehatStepsParser } from './BehatStepsParser';
 import { FeatureLinter } from './FeatureLinter';
 import { llog, ServerSettings, updateSettings } from './util';
 import strim from 'super-trim';
+import { configure, BehatIsNotAvailable } from './Messenger';
 
 const connection = createConnection();
 
@@ -36,6 +37,9 @@ let settings: ServerSettings;
 let listenerDisposable: Disposable;
 
 connection.onInitialize(params => {
+  const window = connection.window;
+  configure(window);
+
   llog('connection initialize', 'debug');
 
   workspaceRoot = params.rootPath as string;
@@ -49,15 +53,23 @@ connection.onInitialize(params => {
   );
   FeatureLinterInstance = new FeatureLinter(BehatStepsParserInstance);
 
+  // check if behat is found
+  const behatIsAvailable = BehatStepsParserInstance.checkBehat();
+
   llog(`Detected behat path: ${BehatStepsParserInstance.getBehatPath()}`, 'debug');
-  llog(`Parsed steps: ${JSON.stringify(BehatStepsParserInstance.getSteps())}`, 'debug');
+  if (behatIsAvailable) {
+    llog(`Parsed steps: ${JSON.stringify(BehatStepsParserInstance.getSteps())}`, 'debug');
+    BehatStepsParserInstance.updateStepsCache();
+  } else {
+    BehatIsNotAvailable(BehatStepsParserInstance.getBehatPath());
+  }
 
   configureListener();
 
   return {
     capabilities: {
       textDocumentSync: documents.syncKind,
-      definitionProvider: BehatStepsParserInstance.behatCanProvideGoToDefinition(),
+      definitionProvider: behatIsAvailable && BehatStepsParserInstance.behatCanProvideGoToDefinition(),
     }
   };
 });
@@ -69,18 +81,23 @@ connection.onRequest('behatChecker.updateCache', () => {
   llog(`Parsed steps: ${JSON.stringify(BehatStepsParserInstance.getSteps())}`, 'debug');
 });
 
-connection.onRequest('behatChecker.reload', () => {
-  BehatStepsParserInstance = new BehatStepsParser(workspaceRoot, settings.configFile, settings.behatPath);
-  FeatureLinterInstance = new FeatureLinter(BehatStepsParserInstance);
-
-  llog(`Parsed steps: ${JSON.stringify(BehatStepsParserInstance.getSteps())}`, 'log');
-});
-
 connection.onDidChangeConfiguration((param) => {
   llog('configuration did changed', 'debug');
   settings = updateSettings(defaultSettings, param.settings.behatChecker);
+
   BehatStepsParserInstance.updateConfig(workspaceRoot, settings.configFile, settings.behatPath);
-  BehatStepsParserInstance.updateStepsCache();
+
+  // check if behat is found
+  const behatIsAvailable = BehatStepsParserInstance.checkBehat();
+
+  llog(`Detected behat path: ${BehatStepsParserInstance.getBehatPath()}`, 'debug');
+  if (behatIsAvailable) {
+    BehatStepsParserInstance.updateStepsCache();
+    llog(`Parsed steps: ${JSON.stringify(BehatStepsParserInstance.getSteps())}`, 'debug');
+  } else {
+    BehatIsNotAvailable(BehatStepsParserInstance.getBehatPath());
+  }
+
   configureListener();
   configureAutoUpdateListener();
 });
