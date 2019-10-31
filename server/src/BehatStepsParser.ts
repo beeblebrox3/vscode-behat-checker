@@ -20,7 +20,6 @@ export class BehatStepsParser {
 
   constructor(projectDirectory: string, configFile = 'behat.yml', behatPath = 'vendor/bin/behat') {
     this.updateConfig(projectDirectory, configFile, behatPath);
-    this.updateStepsCache();
   }
 
   /**
@@ -226,6 +225,15 @@ export class BehatStepsParser {
 
   public treatAssetPath(projectDir: string, assetPath: string) {
     return isAbsolute(assetPath) ? resolve(assetPath) : resolve(projectDir, assetPath);
+  }
+
+  public checkBehat() {
+    try {
+      const out = execSync(`${this.behatCMD} --version`).toString();
+      return out.toLowerCase().includes('behat');
+    } catch (e) {
+      return false;
+    }
   }
 
   private tryToGetContextClassAndMethodFromStepLine(lineContent: string): Partial<Context> | null {

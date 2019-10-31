@@ -14,6 +14,7 @@ const config_file = 'behat.yml';
 const behat_path = 'vendor/bin/behat';
 
 const instance = new BehatStepsParser(project_path, config_file, behat_path);
+instance.updateStepsCache();
 
 jest.dontMock('child_process');
 

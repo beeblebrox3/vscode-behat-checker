@@ -148,6 +148,7 @@ test('update cache', () => {
   require('child_process').__setMockSteps(test_steps);
 
   const localInstance = new BehatStepsParser(project_path, config_file);
+  localInstance.updateStepsCache();
 
   // the 9th is invalid
   expect(localInstance.getSteps().length).toBe(13);
